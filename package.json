@@ -1,0 +1,39 @@
+{
+  "name": "nogadev-control-panel-api",
+  "version": "1.0.0",
+  "description": "An api for blog management of the nogadev page and an endpoint for subscriptions",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidnogadev/nogadev-control-panel-api.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/davidnogadev/nogadev-control-panel-api/issues"
+  },
+  "homepage": "https://github.com/davidnogadev/nogadev-control-panel-api#readme",
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^17.12.3",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.9.4",
+    "sequelize": "^6.37.3",
+    "sequelize-cli": "^6.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
