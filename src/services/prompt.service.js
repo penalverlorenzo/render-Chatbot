@@ -35,9 +35,14 @@ export class PromptServices {
     })
     const text = response.generated_text;
     const regex = /Answer: "(.*?)"/;
+    const regex2 = /Answer: (.*?)/;
     const match = text.match(regex);
+    const match2 = text.match(regex2);
     
-    return match[1]
+    const matchInput = match === null? match2.input.split('Answer: ')[1].split('\n')[0]: match[1] 
+    
+
+    return matchInput
   }
 
 
@@ -52,8 +57,8 @@ export class PromptServices {
       
       const message = payload.message;
 
-      const response = await this.llamaComparison(message, dataString);
-      console.log({response});
+      const response = await this.promptGeneration(message, dataString);
+    
       return res.json({response});
     } catch (error) {
       console.error(error);
