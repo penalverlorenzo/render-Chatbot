@@ -3,10 +3,11 @@ import express from 'express';
 
 import { router } from './routes/info.js';
 import bodyParser from 'body-parser';
+import { config } from './config/index.js';
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = config.port|| 3000;
 
 
 
