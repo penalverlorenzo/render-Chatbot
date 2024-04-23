@@ -9,20 +9,9 @@ export const router = Router();
 const service = new PromptServices()
 
 
-router.get('/info',
-  async (req, res) => {
-    try {
-      const found = await service.getAll(res);
-      return found
-
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-router.post('/info', (req, res) => {
+router.post('/info', async (req, res) => {
   try {
-    const created = service.createInfo(res, req.body)
+    const created = await service.postResponse(res, req.body)
     return created
   } catch (error) {
     console.log(error);

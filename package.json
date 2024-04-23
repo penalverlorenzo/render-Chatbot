@@ -21,6 +21,7 @@
   "homepage": "https://github.com/davidnogadev/nogadev-control-panel-api#readme",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
+    "@huggingface/inference": "^2.6.7",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
