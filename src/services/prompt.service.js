@@ -31,7 +31,7 @@ export class PromptServices {
     const response = await hf.textGeneration({
       model: 'meta-llama/Meta-Llama-3-8B-Instruct',
       parameters: {details: false, decoder_input_details: false, return_full_text: false, do_sample: false, temperature: 0.1},
-      inputs: `Your name is nogabot, you should use this data ${dataString} to answer the following question ${message}, You must read the question and If it's a no sense question Example: "adawada", you must return a answer saying that the prompt was not a question, Example: "Answer: Sorry, you must send a valid question", I want the answer with the following structure "Answer: "` ,
+      inputs: `Your name is nogabot, you should use this data ${dataString} to answer the following question ${message}, You must read the question and If it's a no sense prompt Example: "adawada", another Example: "uiqiuq", etc, you must detect this patterns and you must return a answer saying that the prompt was not a question, Example: "Answer: Sorry, you must send a valid question", I want the answer with the following structure "Answer: "` ,
     })
     const text = response.generated_text;
     const regex = /Answer: "(.*?)"/;
@@ -40,7 +40,7 @@ export class PromptServices {
     const match2 = text.match(regex2);
     
     const matchInput = match === null? match2.input.split('Answer: ')[1].split('\n')[0]: match[1] 
-
+    console.log({response, matchInput});
     return matchInput
   }
 
