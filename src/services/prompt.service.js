@@ -52,7 +52,7 @@ export class PromptServices {
       
       const message = payload.message;
 
-      const response = await this.llamaComparison(message, dataString);
+      const response = await this.promptGeneration(message, dataString);
       console.log({response});
       return res.json({response});
     } catch (error) {
