@@ -34,12 +34,13 @@ export class PromptServices {
       inputs: `Your name is kike, you should use this data ${dataString} to answer the following question, I want the answer with the following structure "Answer: "(Final Answer)"." : ${message}` ,
     })
     const text = response.generated_text;
+    console.log(text);
     const regex = /Answer: "(.*?)"/;
     const regex2 = /Answer: (.*?)/;
     const match = text.match(regex);
     const match2 = text.match(regex2);
     
-    const matchInput = match === null? match2.input.split('Answer: ')[1].split('\n')[0]: match[1] 
+    const matchInput = match === null? match2.input.split('Answer: ')[1].split('\n')[0] : match[1] 
 
     return matchInput
   }
