@@ -31,7 +31,7 @@ export class PromptServices {
     const response = await hf.textGeneration({
       model: 'meta-llama/Meta-Llama-3-8B-Instruct',
       parameters: {details: false, decoder_input_details: false, return_full_text: false, do_sample: false, temperature: 0.1},
-      inputs: `Use this data ${dataString} to answer the following question, I want the answer with the following structure "Answer: "(Final Answer)".": ${message}` ,
+      inputs: `Your name is nogabot, you should use this data ${dataString} to answer the following question, I want the answer with the following structure "Answer: "(Final Answer)"." : ${message}` ,
     })
     const text = response.generated_text;
     const regex = /Answer: "(.*?)"/;
@@ -57,7 +57,6 @@ export class PromptServices {
       const message = payload.message;
 
       const response = await this.promptGeneration(message, dataString);
-    
       return res.json({response});
     } catch (error) {
       console.error(error);
