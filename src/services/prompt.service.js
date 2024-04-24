@@ -40,7 +40,6 @@ export class PromptServices {
     const match2 = text.match(regex2);
     
     const matchInput = match === null? match2.input.split('Answer: ')[1].split('\n')[0]: match[1] 
-    
 
     return matchInput
   }
