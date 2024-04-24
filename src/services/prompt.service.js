@@ -15,7 +15,7 @@ export class PromptServices {
   };
 
   async dataComparison(message, dataString) {
-    const hf = new HfInference(config.accessToken);
+    const hf = new HfInference(config.iaKey);
     const response = await hf.questionAnswering({
       model: 'deepset/roberta-base-squad2',
       inputs: {
@@ -27,11 +27,11 @@ export class PromptServices {
   }
 
   async promptGeneration(message, dataString) {
-    const hf = new HfInference(config.accessToken);
+    const hf = new HfInference(config.iaKey);
     const response = await hf.textGeneration({
       model: 'meta-llama/Meta-Llama-3-8B-Instruct',
       parameters: {details: false, decoder_input_details: false, return_full_text: false, do_sample: false, temperature: 0.1},
-      inputs: `Your name is nogabot, you should use this data ${dataString} to answer the following question, I want the answer with the following structure "Answer: "(Final Answer)"." : ${message}` ,
+      inputs: `Your name is kike, you should use this data ${dataString} to answer the following question, I want the answer with the following structure "Answer: "(Final Answer)"." : ${message}` ,
     })
     const text = response.generated_text;
     const regex = /Answer: "(.*?)"/;
