@@ -29,6 +29,7 @@ export class PromptServices {
   
   async promptGeneration(message, dataString) {
     try {
+      const resFormat = 'Answer: ' || 'answer: '
       // Se crea instancia de huggin face con nuestro access token de hugging face
     const hf = new HfInference(config.iaKey);
       // Se crea la primer prommpt, esta prompt está encargada de darle un contexto y hacer que la IA genere una respuesta
@@ -50,12 +51,12 @@ export class PromptServices {
     const firstPromptRes = firstPrompt.generated_text;
     // En la prompt se le dió un output específico para que retorne, estas expresiones regulares detectan ese output
     const firstPromptRegex = /{\n\s+"answer": "([^"]+)"\n\s+}/;
-    const firstPromptRegex2 = /{\n\s+"answer": ([^"]+)\n\s+}/;
+    const firstPromptRegex2 = /{\n\s+"answer": ([^"]+)\n\s+}/
     // Hay 2 posibles respuestas que puede dar la IA con "" o sin, se hace match para 2 posibles casos
     const firstPromptMatch = firstPromptRes.match(firstPromptRegex);
     const firstPromptMatch2 = firstPromptRes.match(firstPromptRegex2);
     // Si el primer match de la regex 1 da como resultado null significa que no encontró con la estructura especificada, entonces vamos al .input del match 2 (Ya que el match 1 es null) y hacemos que haga un split de 'Answer: ' y tomamos el segundo index que trae la respuesta ['Answer: ', ...] 
-    const firstPromptMatchInput = firstPromptMatch === null? firstPromptMatch2.input.split('Answer: ')[1].split('\n')[0]: firstPromptMatch[1]
+    const firstPromptMatchInput = firstPromptMatch === null? firstPromptMatch2.input.split(resFormat)[1].split('\n')[0]: firstPromptMatch[1]
     // Se crea una segunda prompt que recibe la prompt anterior, esta está encargada de recibir la data, la prompt y el resultado de la firstPrompt, compara la prompt y el resultado, si el resultado tiene sentido te lo devuelve, sino te lo rechaza.
     const secondPrompt = await hf.textGeneration({
       model: 'meta-llama/Meta-Llama-3-8B-Instruct',
@@ -70,13 +71,14 @@ export class PromptServices {
       `
       ,
     })
+
     // Se le usa la mísma lógica que en la firstPrompt
     const secondPromptRes = secondPrompt.generated_text;
-    const secondPromptRegex = /Answer: "(.*?)"/;
-    const secondPromptRegex2 = /Answer: (.*?)/;
+    const secondPromptRegex = /{\n\s+"answer": "([^"]+)"\n\s+}/;
+    const secondPromptRegex2 = /{\n\s+"answer": ([^"]+)\n\s+}/
     const secondPromptMatch = secondPromptRes.match(secondPromptRegex);
-    const secondPromptMatch2 = secondPromptRes.match(secondPromptRegex2);
-    const secondPromptMatchInput = secondPromptMatch === null? secondPromptMatch2.input.split('Answer: ')[1].split('\n')[0]: secondPromptMatch[1]
+    const secondPromptMatch2 = secondPromptRes.match(secondPromptRegex2);   
+    const secondPromptMatchInput = secondPromptMatch === null? secondPromptMatch2.input.split(resFormat)[1].split('\n')[0]: secondPromptMatch[1]
     return secondPromptMatchInput
     } catch (error) {
       throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${error}`)
