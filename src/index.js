@@ -12,7 +12,9 @@ const PORT = config.port|| 3000;
 
 app.use(cors({
     origin: 'http://localhost:5173',
-    origin: 'http://localhost:4321'
+    origin: 'http://localhost:4321',
+    origin: 'http://localhost:3001',
+    origin: 'http://localhost:3000'
 }));
 
 
