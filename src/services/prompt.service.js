@@ -76,9 +76,7 @@ export class PromptServices {
     const secondPromptRegex = /{\n\s+"answer": "([^"]+)"\n\s+}/;
     const secondPromptRegex2 = /{\n\s+"answer": ([^"]+)\n\s+}/
     const secondPromptMatch = secondPromptRes.match(secondPromptRegex);
-    const secondPromptMatch2 = secondPromptRes.match(secondPromptRegex2);
-    console.log({sm:secondPromptRes});
-   
+    const secondPromptMatch2 = secondPromptRes.match(secondPromptRegex2);   
     const secondPromptMatchInput = secondPromptMatch === null? secondPromptMatch2.input.split(resFormat)[1].split('\n')[0]: secondPromptMatch[1]
     return secondPromptMatchInput
     } catch (error) {
