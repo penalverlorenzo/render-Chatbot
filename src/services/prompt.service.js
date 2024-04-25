@@ -27,7 +27,8 @@ export class PromptServices {
   }
 
   
-  async promptGeneration(message, dataString) {
+  async promptGeneration(prom, dataString) {
+    const message = prom + "?";
     try {
       const resFormat = 'Answer: ' || 'answer: '
       // Se crea instancia de huggin face con nuestro access token de hugging face
