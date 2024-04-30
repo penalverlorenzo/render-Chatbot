@@ -33,7 +33,6 @@ export class PromptServices {
       const resFormat = 'Answer: ' || 'answer: '
       // Se crea instancia de huggin face con nuestro access token de hugging face
     const hf = new HfInference(config.iaKey);
-
     const promptDeCh = `
     Instrucciones Generales:
 
@@ -63,6 +62,7 @@ export class PromptServices {
     
     //  Traemos la respuesta de la primer prompt
     const firstPromptRes = firstPrompt.generated_text.replaceAll('\n', '');
+    console.log({firstPromptRes});
       return firstPromptRes;
     } catch (error) {
       throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${error}`)
