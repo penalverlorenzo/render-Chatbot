@@ -70,29 +70,41 @@ export class PromptServices {
 
 
   async geminiGeneration(message, dataString) {
-    const genAI = new GoogleGenerativeAI(config.iaKey)
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" })
-    const prompt = `Basado en esta información responde todas las preguntas: ${dataString}`
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: `${prompt}` }
-          ]
-        }, {
-          role: "model",
-          parts: [{text: "Nice to meet you, I'm Kike. How can I help you?"}]
+    try {
+      const genAI = new GoogleGenerativeAI(config.iaKey)
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      const prompt = `
+      Respond to messages using this information: ${dataString}.
+      In case the message is not related to the information, let them know that you're not designed to respond to that.
+      If they ask you for a joke, tell a short one related to programming.
+      Respond in the language the message is in, if you can't asnwer in the asked language you must answer in english.
+      `
+      const chat = model.startChat({
+        history: [
+          {
+            role: "user",
+            parts: [{ text: `${prompt}` }
+            ]
+          }, {
+            role: "model",
+            parts: [{text: "Nice to meet you, I'm Kike. How can I help you?"}]
+          }
+        ], 
+        context:"sos un agente IA de nogadev, te llamas Kike, estas para ayudar a los usuarios de su pagina",
+        generationConfig:{
+          maxOutputTokens: 100,
         }
-      ], 
-      generationConfig:{
-        maxOutputTokens: 100
-      }
-    })
-    const result = await chat.sendMessage(message)
-    const response = result.response
-    const text = response.text()
-    console.log(text);
-    return text
+      })
+      const result = await chat.sendMessage(message)
+      const response = result.response
+      const text = response.text()
+      console.log(text);
+      return text
+    } catch (e) {
+      console.log({e});
+      console.log(e.errorDetails[0].fieldViolations[0].description);
+      throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${e.errorDetails[0].fieldViolations[0].description}`)
+    }
   }
 
   async postResponse(res, payload){
