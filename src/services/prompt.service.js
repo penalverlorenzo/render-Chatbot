@@ -70,29 +70,37 @@ export class PromptServices {
 
 
   async geminiGeneration(message, dataString) {
-    const genAI = new GoogleGenerativeAI(config.iaKey)
+   try { const genAI = new GoogleGenerativeAI(config.iaKey)
     const model = genAI.getGenerativeModel({ model: "gemini-pro" })
-    const prompt = `Basado en esta información responde todas las preguntas: ${dataString}`
+    const prompt = `
+    Task: You must answer in the language you are asked to, if you can't asnwer in the asked language you must answer in english. If you don't follow this task or the following tasks you will be punished.
+    Task: You must provide an answer using the following information: ${dataString}. You are forbidden to answer anything not related to this information.
+    Task: Your answer must not contain *. If you want to do a list then you should use another symbol.
+    `
     const chat = model.startChat({
       history: [
         {
           role: "user",
-          parts: [{ text: `${prompt}` }
+          parts: [{ text: `${prompt}`}
           ]
-        }, {
+        },
+        {
           role: "model",
-          parts: [{text: "Nice to meet you, I'm Kike. How can I help you?"}]
+          parts: [{text: "Nice to meet you, I'm Kike. How can I help you?", }]
         }
       ], 
       generationConfig:{
-        maxOutputTokens: 100
+        maxOutputTokens: 100,
       }
     })
     const result = await chat.sendMessage(message)
     const response = result.response
     const text = response.text()
     console.log(text);
-    return text
+    return text}
+    catch (e){
+      console.log(e.errorDetails[0].fieldViolations[0].description);
+    }
   }
 
   async postResponse(res, payload){
@@ -107,6 +115,7 @@ export class PromptServices {
       const message = payload.message;
 
       const response = await this.geminiGeneration(message, dataString);
+      console.log({response});
       return res.json({response});
     } catch (error) {
       return res.status(400).json({error: error.message})
