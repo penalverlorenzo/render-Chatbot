@@ -3,6 +3,7 @@ import { promptModel } from "../models/prompt.model.js";
 import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import jwt from "jsonwebtoken"
 
 export class PromptServices {
   async getAll() {
@@ -77,7 +78,7 @@ export class PromptServices {
       Respond to messages using this information: ${dataString}.
       In case the message is not related to the information, let them know that you're not designed to respond to that.
       If they ask you for a joke, tell a short one related to programming.
-      Respond in the language the message is in, if you can't asnwer in the asked language you must answer in english.
+      Respond in the language the message is in, If you cannot respond in the asked language, you must answer in English.
       `
       const chat = model.startChat({
         history: [
@@ -122,6 +123,36 @@ export class PromptServices {
       return res.json({response});
     } catch (error) {
       return res.status(400).json({error: error.message})
+    }
+  }
+
+
+  // Generar token
+  async generarToken(req, res) {
+    try {
+      const { jwtSecret } = req.body; // La clave secreta se espera que llegue en el cuerpo de la solicitud
+      if (!jwtSecret || jwtSecret !== config.jwtSecret) {
+        return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
+      }
+  
+      // Genera el token utilizando la clave secreta
+      const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
+      // Devuelve el token en la respuesta JSON
+      return res.json({ token });
+    } catch (error) {
+      // Maneja cualquier error que pueda ocurrir durante la generación del token
+      console.error('Error al generar el token:', error);
+      return res.status(500).json({ mensaje: 'Error al generar el token' });
+    }
+  }
+
+  // Verificar token
+  async verificarToken(token) {
+    try {
+      const decoded = jwt.verify(token, config.jwtSecret);
+      return decoded.usuario;
+    } catch (error) {
+      throw new Error('Token inválido');
     }
   }
 }

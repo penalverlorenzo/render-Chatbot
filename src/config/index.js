@@ -7,5 +7,6 @@ export const config = {
   mongodbURL: process.env.MONGODB_URL,
   iaKey: process.env.IA_KEY,
   hostIA: process.env.HOST_IA,
+  jwtSecret: process.env.JWT_SECRET,
 };
 
