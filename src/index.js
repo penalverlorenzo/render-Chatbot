@@ -2,7 +2,7 @@ import './db/database.js';
 import express from 'express';
 import cors from 'cors';
 
-import { router } from './routes/info.js';
+import { router } from './routes/index.js';
 import bodyParser from 'body-parser';
 import { config } from './config/index.js';
 
