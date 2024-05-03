@@ -3,21 +3,19 @@ import { config } from '../config/index.js'
 
 export function verificationToken (req, res, next) {
   const token = req.headers.authorization
-  const tokenString = JSON.stringify(token)
-console.log({token});
+  const parsedToken = token.split('Bearer ')[1]
+  
   if (!token) {
     console.error('Unauthorized access. Token not provided1.')
-    // const response = formatApiResponse({ data: null, status: 401, message: 'Unauthorized access. Token not provided.' })
-    // return res.status(response.status).json(response)
+    return res.status(401).json({ message: 'Unauthorized access.' });
   }
 
   try {
-    const validToken = jwt.verify(token, config.jwtSecret);
-    console.log({validToken});
-    next()
+    const validToken = jwt.verify(parsedToken, config.jwtSecret);
+    validToken? next(): res.status(401).json({ message: 'Unauthorized access.' });
+    
   } catch (error) {
     console.error('Unauthorized access. Token not provided: ', error)
-    // const response = formatApiResponse({ data: null, status: 401, message: 'Unauthorized access. Token not provided.' })
-    // return res.status(response.status).json(response)
+    return res.status(401).json({ message: 'Unauthorized access.' });
   }
 }
