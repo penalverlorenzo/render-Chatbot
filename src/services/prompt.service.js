@@ -4,6 +4,8 @@ import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import jwt from "jsonwebtoken"
+import * as crypto from 'node:crypto'
+
 
 export class PromptServices {
   async getAll() {
@@ -132,13 +134,16 @@ export class PromptServices {
   async generarToken(req, res) {
     try {
       const { jwtSecret } = req.body; // La clave secreta se espera que llegue en el cuerpo de la solicitud
-      if (!jwtSecret || jwtSecret !== config.jwtSecret) {
+      const decoded = crypto.createHash('sha256').update(config.jwtSecret).digest('hex');
+
+      if (decoded !== jwtSecret ) {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
-  
+      
       // Genera el token utilizando la clave secreta
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
       // Devuelve el token en la respuesta JSON
+      console.log({jwtSecret, token});
       return res.json({ token });
     } catch (error) {
       // Maneja cualquier error que pueda ocurrir durante la generación del token
