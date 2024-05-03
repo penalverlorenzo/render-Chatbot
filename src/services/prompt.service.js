@@ -6,6 +6,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
+
 export class PromptServices {
   async getAll() {
     try {
@@ -121,6 +122,7 @@ export class PromptServices {
       const message = payload.message;
 
       const response = await this.geminiGeneration(message, dataString);
+      console.log({response});
       return res.json({response});
     } catch (error) {
       return res.status(400).json({error: error.message})
@@ -131,14 +133,17 @@ export class PromptServices {
   // Generar token
   async generarToken(req, res) {
     try {
-      const { jwtSecret } = req.body; 
-      const comp = bcrypt.compare(config.jwtSecret, jwtSecret);
+      const { jwtSecret } = req.body; // La clave secreta se espera que llegue en el cuerpo de la solicitud
+      const decoded = crypto.createHash('sha256').update(config.jwtSecret).digest('hex');
 
-      if (comp === false) {
+      if (decoded !== jwtSecret ) {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
-
+      
+      // Genera el token utilizando la clave secreta
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
+      // Devuelve el token en la respuesta JSON
+      console.log({jwtSecret, token});
       return res.json({ token });
     } catch (error) {
       console.error('Error al generar el token:', error);
