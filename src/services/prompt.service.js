@@ -3,6 +3,7 @@ import { promptModel } from "../models/prompt.model.js";
 import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 export class PromptServices {
@@ -130,17 +131,16 @@ export class PromptServices {
   // Generar token
   async generarToken(req, res) {
     try {
-      const { jwtSecret } = req.body; // La clave secreta se espera que llegue en el cuerpo de la solicitud
-      if (!jwtSecret || jwtSecret !== config.jwtSecret) {
+      const { jwtSecret } = req.body; 
+      const comp = bcrypt.compare(config.jwtSecret, jwtSecret);
+
+      if (comp === false) {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
-  
-      // Genera el token utilizando la clave secreta
+
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      // Devuelve el token en la respuesta JSON
       return res.json({ token });
     } catch (error) {
-      // Maneja cualquier error que pueda ocurrir durante la generación del token
       console.error('Error al generar el token:', error);
       return res.status(500).json({ mensaje: 'Error al generar el token' });
     }
