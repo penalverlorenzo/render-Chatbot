@@ -3,8 +3,9 @@ import { promptModel } from "../models/prompt.model.js";
 import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
+import * as crypto from 'node:crypto'
+
 
 
 export class PromptServices {

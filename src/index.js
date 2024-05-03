@@ -2,9 +2,10 @@ import './db/database.js';
 import express from 'express';
 import cors from 'cors';
 
-import { router } from './routes/index.js';
+import { infoRouter, } from './routes/info.js';
 import bodyParser from 'body-parser';
 import { config } from './config/index.js';
+import { tokenRouter } from './routes/tokens.js';
 
 
 const app = express();
@@ -21,7 +22,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-app.use('/api/v1', router)
+app.use('/api/v1', tokenRouter)
+app.use('/api/v1', infoRouter)
 
 
 app.listen(PORT, () => {
