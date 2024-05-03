@@ -7,6 +7,7 @@ export function verificationToken (req, res, next) {
   
   if (!token) {
     console.error('Unauthorized access. Token not provided1.')
+
     return res.status(401).json({ message: 'Unauthorized access.' });
   }
 
@@ -16,6 +17,7 @@ export function verificationToken (req, res, next) {
     
   } catch (error) {
     console.error('Unauthorized access. Token not provided: ', error)
+
     return res.status(401).json({ message: 'Unauthorized access.' });
   }
 }
