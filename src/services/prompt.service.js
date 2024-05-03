@@ -153,12 +153,12 @@ export class PromptServices {
   }
 
   // Verificar token
-  async verificarToken(token) {
-    try {
-      const decoded = jwt.verify(token, config.jwtSecret);
-      return decoded.usuario;
-    } catch (error) {
-      throw new Error('Token inválido');
-    }
-  }
+  // async verificarToken(token) {
+  //   try {
+  //     const decoded = jwt.verify(token, config.jwtSecret);
+  //     return decoded.usuario;
+  //   } catch (error) {
+  //     throw new Error('Token inválido');
+  //   }
+  // }
 }
