@@ -134,16 +134,13 @@ export class PromptServices {
   // Generar token
   async generarToken(req, res) {
     try {
-      const { jwtSecret } = req.body; // La clave secreta se espera que llegue en el cuerpo de la solicitud
+      const { jwtSecret } = req.body;
       const decoded = crypto.createHash('sha256').update(config.jwtSecret).digest('hex');
 
       if (decoded !== jwtSecret ) {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
-      
-      // Genera el token utilizando la clave secreta
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      // Devuelve el token en la respuesta JSON
       console.log({jwtSecret, token});
       return res.json({ token });
     } catch (error) {
@@ -152,13 +149,18 @@ export class PromptServices {
     }
   }
 
-  // Verificar token
-  async verificarToken(token) {
+  async refreshToken(req, res) {
     try {
+      const { token } = req.body;
       const decoded = jwt.verify(token, config.jwtSecret);
-      return decoded.usuario;
+      if (!token) {
+        return res.status(401).json({message: 'Token not provided.'})
+      }
+      const refreshedToken = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
+      console.log({decoded, token, refreshedToken});
+      return res.json({ refreshedToken });
     } catch (error) {
-      throw new Error('Token inválido');
+      return res.status(401).json({message: 'Invalid Token'})
     }
   }
 }

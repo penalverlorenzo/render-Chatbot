@@ -11,7 +11,7 @@ tokenRouter.post('/login', async ( req, res) => {
   return token;
 })
 
-tokenRouter.post('/refresh-token', async (res) => {
-  const Hola = await service.Hola()
-  return Hola;
+tokenRouter.post('/refresh-token', async (req,res) => {
+  const refreshToken = await service.refreshToken(req,res)
+  return refreshToken;
 })
