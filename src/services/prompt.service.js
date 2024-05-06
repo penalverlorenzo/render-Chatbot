@@ -141,8 +141,8 @@ export class PromptServices {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      console.log({jwtSecret, token});
-      return res.json({ token });
+      const refreshToken = jwt.sign({}, config.jwtSecret, { expiresIn: '12h' });
+      return res.json({ token, refreshToken });
     } catch (error) {
       console.error('Error al generar el token:', error);
       return res.status(500).json({ mensaje: 'Error al generar el token' });
