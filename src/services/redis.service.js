@@ -3,8 +3,8 @@ import { config } from "../config/index.js";
 const client = createClient({
     password: config.redisPassword,
     socket: {
-        host: 'redis-15293.c308.sa-east-1-1.ec2.redns.redis-cloud.com',
-        port: 15293
+        host: 'redis-18030.c1.asia-northeast1-1.gce.redns.redis-cloud.com',
+        port: 18030
     }
 });
 await client.connect()
