@@ -5,10 +5,6 @@ export const redisRouter = Router();
 
 const service = new RedisServices()
 
-// redisRouter.get('/items', async ( req, res) => {
-//   const item = await service.getItem(req, res)
-//   return item;
-// })
 redisRouter.get('/items/:id', async ( req, res) => {
   const id = req.params.id
   const item = await service.getItem(id, res)

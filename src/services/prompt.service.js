@@ -5,7 +5,28 @@ import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import jwt from "jsonwebtoken"
 import * as crypto from 'node:crypto'
+import { RedisServices } from "./redis.service.js";
+const redis = new RedisServices()
 
+
+const parseMessage = (message) => {
+  // Expresiones Regulares para cada posible caso de vocales con caracteres especiales
+  const vowelCaseA = /[áÁàâÀÂäÄãÃ]/g;
+  const vowelCaseE = /[èéÈêÊëËÉ]/g;
+  const vowelCaseI = /[îíÍÎïÌìÏ]/g;
+  const vowelCaseO = /[öóòÒôõÕÔÓÖ]/g;
+  const vowelCaseU = /[üÜùûÛÙúÚ]/g;
+  // Se limpia el mensaje, se lo pasa a minúsculas, se le quitan los espacios y signos de preguntas, además se reemplazan las vocales con caracteres especiales por vocales simples
+  const cleanedMessage = message.toLowerCase()
+  .replaceAll(/[¿?\s]/g, '')
+  .replaceAll(vowelCaseA, 'a')
+  .replaceAll(vowelCaseI, 'i')
+  .replaceAll(vowelCaseO, 'o')
+  .replaceAll(vowelCaseU, 'u')
+  .replaceAll(vowelCaseE, 'e');
+
+  return cleanedMessage
+}
 
 
 export class PromptServices {
@@ -61,11 +82,7 @@ export class PromptServices {
       inputs: promptDeCh
       ,
     });
-  
-    // console.log({firstPrompt});
-    //  Traemos la respuesta de la primer prompt
     const firstPromptRes = firstPrompt.generated_text.replaceAll('\n', '');
-    // console.log({firstPromptRes});
       return firstPromptRes;
     } catch (error) {
       throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${error}`)
@@ -102,7 +119,6 @@ export class PromptServices {
       const result = await chat.sendMessage(message)
       const response = result.response
       const text = response.text()
-      // console.log(text);
       return text
     } catch (e) {
       console.log({e});
@@ -113,18 +129,24 @@ export class PromptServices {
 
   async postResponse(res, payload){
     try {
-      const data = await this.getAll();
-      const dataPrev = data.map(item => {
-        const {_id, ...Data } = item; 
-        return Data._doc.Data;
-      })
-      const dataString = JSON.stringify(dataPrev);
-      
       const message = payload.message;
-
-      const response = await this.geminiGeneration(message, dataString);
-      // console.log({response});
-      return res.json({response});
+      const parsedMessage = parseMessage(message)
+      const redisItem = await redis.getItem(parsedMessage, res)
+      console.log({data: redisItem});
+      if (!redisItem) {
+        const data = await this.getAll();
+        const dataPrev = data.map(item => {
+          const {_id, ...Data } = item; 
+          return Data._doc.Data;
+        })
+        const dataString = JSON.stringify(dataPrev);
+        const response = await this.geminiGeneration(message, dataString);
+        const redisRes = await redis.createItem( response,parsedMessage, res)
+        return res.json({response});
+      }
+      else{
+        return res.json({response: redisItem})
+      }
     } catch (error) {
       return res.status(400).json({error: error.message})
     }
