@@ -144,7 +144,6 @@ export class PromptServices {
       const refreshToken = jwt.sign({}, config.jwtSecret, { expiresIn: '12h' });
       return res.json({ token, refreshToken });
     } catch (error) {
-      console.error('Error al generar el token:', error);
       return res.status(500).json({ mensaje: 'Error al generar el token' });
     }
   }

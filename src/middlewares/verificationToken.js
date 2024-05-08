@@ -6,17 +6,12 @@ export function verificationToken (req, res, next) {
   const parsedToken = token.split('Bearer ')[1]
   
   if (!token) {
-    console.error('Unauthorized access. Token not provided.')
-
     return res.status(401).json({ message: 'Unauthorized access.' });
   }
   try {
     const validToken = jwt.verify(parsedToken, config.jwtSecret);
-    validToken? next(): res.status(401).json({ message: 'Unauthorized access.' });
-    
+    return validToken? next(): res.status(401).json({ message: 'Unauthorized access.' });
   } catch (error) {
-    console.error('Unauthorized access. Token not provided: ', error)
-
     return res.status(401).json({ message: 'Unauthorized access.' });
   }
 }
