@@ -132,7 +132,6 @@ export class PromptServices {
       const message = payload.message;
       const parsedMessage = parseMessage(message)
       const redisItem = await redis.getItem(parsedMessage, res)
-      console.log({data: redisItem});
       if (!redisItem) {
         const data = await this.getAll();
         const dataPrev = data.map(item => {
@@ -141,7 +140,7 @@ export class PromptServices {
         })
         const dataString = JSON.stringify(dataPrev);
         const response = await this.geminiGeneration(message, dataString);
-        const redisRes = await redis.createItem( response,parsedMessage, res)
+        await redis.createItem( response,parsedMessage, res)
         return res.json({response});
       }
       else{
