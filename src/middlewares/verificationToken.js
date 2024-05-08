@@ -10,7 +10,6 @@ export function verificationToken (req, res, next) {
 
     return res.status(401).json({ message: 'Unauthorized access.' });
   }
-
   try {
     const validToken = jwt.verify(parsedToken, config.jwtSecret);
     validToken? next(): res.status(401).json({ message: 'Unauthorized access.' });
