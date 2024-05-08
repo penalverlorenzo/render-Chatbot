@@ -62,10 +62,10 @@ export class PromptServices {
       ,
     });
   
-    console.log({firstPrompt});
+    // console.log({firstPrompt});
     //  Traemos la respuesta de la primer prompt
     const firstPromptRes = firstPrompt.generated_text.replaceAll('\n', '');
-    console.log({firstPromptRes});
+    // console.log({firstPromptRes});
       return firstPromptRes;
     } catch (error) {
       throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${error}`)
@@ -102,7 +102,7 @@ export class PromptServices {
       const result = await chat.sendMessage(message)
       const response = result.response
       const text = response.text()
-      console.log(text);
+      // console.log(text);
       return text
     } catch (e) {
       console.log({e});
@@ -123,7 +123,7 @@ export class PromptServices {
       const message = payload.message;
 
       const response = await this.geminiGeneration(message, dataString);
-      console.log({response});
+      // console.log({response});
       return res.json({response});
     } catch (error) {
       return res.status(400).json({error: error.message})
@@ -141,7 +141,7 @@ export class PromptServices {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
       const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      console.log({jwtSecret, token});
+      // console.log({jwtSecret, token});
       return res.json({ token });
     } catch (error) {
       console.error('Error al generar el token:', error);
@@ -157,7 +157,7 @@ export class PromptServices {
         return res.status(401).json({message: 'Token not provided.'})
       }
       const refreshedToken = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      console.log({decoded, token, refreshedToken});
+      // console.log({decoded, token, refreshedToken});
       return res.json({ refreshedToken });
     } catch (error) {
       return res.status(401).json({message: 'Invalid Token'})
