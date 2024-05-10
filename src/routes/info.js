@@ -10,7 +10,6 @@ infoRouter.use(verificationToken);
 
 infoRouter.post('/info', async (req, res) => {
   try {
-    // console.log({req: req.body});
     const created = await service.postResponse(res, req.body)
     return created
   } catch (error) {
@@ -18,5 +17,17 @@ infoRouter.post('/info', async (req, res) => {
   }
 })
 
-
+infoRouter.get('/info', async (req, res) => {
+  try {
+    const created = await service.getAll()
+    const dataPrev = created.map(item => {
+      const {_id, ...Data } = item; 
+      return Data._doc.Data;
+    })
+    console.log({created});
+    res.send(dataPrev);
+  } catch (error) {
+    console.log(error);
+  }
+})
 

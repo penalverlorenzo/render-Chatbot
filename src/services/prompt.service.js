@@ -141,7 +141,10 @@ export class PromptServices {
         })
         const dataString = JSON.stringify(dataPrev);
         const response = await this.geminiGeneration(message, dataString);
-        await redis.createItem( response,parsedMessage, res)
+        const regexChiste = /\b(chiste|broma|gracia|burla|chistorete|chascarrillo|joda|joke|funny|humor|laugh|jest|wit)\b/i;
+        if (!regexChiste.test(message)) {
+          await redis.createItem( response,parsedMessage, res)
+        } 
         return res.json({response});
       }
       else{
