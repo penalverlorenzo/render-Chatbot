@@ -143,6 +143,7 @@ export class PromptServices {
         const response = await this.geminiGeneration(message, dataString);
         const regexChiste = /\b(chiste|broma|gracia|burla|chistorete|chascarrillo|joda|joke|funny|humor|laugh|jest|wit)\b/i;
         if (!regexChiste.test(message)) {
+          console.log("Entre");
           await redis.createItem( response,parsedMessage, res)
         } 
         return res.json({response});
