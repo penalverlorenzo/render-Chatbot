@@ -8,6 +8,8 @@ export const config = {
   iaKey: process.env.IA_KEY,
   hostIA: process.env.HOST_IA,
   jwtSecret: process.env.JWT_SECRET,
-  redisPassword: process.env.REDIS_PASSWORD
+  redisPassword: process.env.REDIS_PASSWORD,
+  redisHost: process.env.REDIS_HOST,
+  redisPort: process.env.REDIS_PORT,
 };
 
