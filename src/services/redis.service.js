@@ -7,7 +7,7 @@ const client = createClient({
         port: config.redisPort
     }
 });
-await client.connect()
+const clientRedis = await client.connect()
 
 export class RedisServices {
 async createItem(value,key){

@@ -102,11 +102,23 @@ export class PromptServices {
       In case the message is not related to the information, let them know that you're not designed to respond to that.
       If they ask you for a joke, tell a short one related to programming , respond in the language the message is in.
       `;
-      const prompt2 = `
-      Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, 
-      En caso de que haya relación: Deberás retornar tu respuesta con la siguiente estructura: "[Esto tiene contexto]", seguido de tu respuesta, recuerda que solo en caso de que el historial: ${history} tenga relación para que puedas responder, recuerda que el historial es solo uno y es el proporcionado previamente.
-      En caso de que no tengan ninguna relación o nada en común: Devuelve la respuesta con esta estructura: "[Sin Contexto]", seguido de tu respuesta.
-      `;
+
+      // const prompt2 = `Tienes que responder si el mensaje hace referencia a un mensaje recibido anteriormente por lo que tu principal tarea es retornar si tu respuesta utilizo estas respuestas y mensajes anteriores (Estas son las respuestas y mensajes: ${history}), en caso de ser así, devuelve [Util] seguido de tu respuesta, sino solo devuelve la respuesta con [inutil]`;
+      
+      // const prompt2 = `
+      // Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial.
+      // En caso de que haya relación: Deberás retornar tu respuesta en base al historial espesificando que es en base al historial.
+      // `;
+
+      // const prompt2 =`
+      // porfavor decime cual seria la mejor respuesta para la pregunta tienes este historial para tenerlo en cuenta ${history}:
+      // Explanation1: esta pregunta necesita la anterior pregunta para responder
+      // Explanation2: esta pregunta no se necesita saber la anterior pregunta para responder
+      // responde:[(tu respuesta)] (respuesta a la pregunta)
+      // `
+
+    
+
       const chat = model.startChat({
         history: [
           {
@@ -142,7 +154,7 @@ export class PromptServices {
     }
   }
 
-  async postResponse(res, payload, si){
+  async postResponse(res, payload){
     try {
       const message = payload.message;
       const parsedMessage = parseMessage(message)
@@ -158,7 +170,6 @@ export class PromptServices {
         const response = await this.geminiGeneration(message, dataString);
         const regexChiste = /\b(chiste|broma|gracia|burla|chistorete|chascarrillo|joda|joke|funny|humor|laugh|jest|wit)\b/i;
         if (!regexChiste.test(message)) {
-          console.log("Entre");
           await redis.createItem( response,parsedMessage, res)
           if (history.length === 6) {
             for (let i = 0; i <= 4; i++) {
