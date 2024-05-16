@@ -91,7 +91,7 @@ export class PromptServices {
   }
 
 
-  async geminiGeneration(message, dataString, count = 0) {
+  async geminiGeneration(message, dataString, history, count = 0) {
     try {
       const genAI = new GoogleGenerativeAI(config.iaKey)
       const model = genAI.getGenerativeModel({ model: "gemini-pro" })
@@ -103,24 +103,17 @@ export class PromptServices {
       If they ask you for a joke, tell a short one related to programming , respond in the language the message is in.
       `;
       const prompt2 = `
-      Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, 
-      En caso de que haya relación: Deberás retornar tu respuesta con la siguiente estructura: "[Esto tiene contexto]", seguido de tu respuesta, recuerda que solo en caso de que el historial: ${history} tenga relación para que puedas responder, recuerda que el historial es solo uno y es el proporcionado previamente.
-      En caso de que no tengan ninguna relación o nada en común: Devuelve la respuesta con esta estructura: "[Sin Contexto]", seguido de tu respuesta.
-      `;
+      Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, una vez completado, retorna tu respuesta`;
       const chat = model.startChat({
         history: [
           {
             role: "user",
-            parts: [{ text: prompt }]
+            parts: [{ text: prompt }, {text: prompt2}]
           },
           {
             role: "model",
             parts: [{text: "Nice to meet you, I'm Kike. How can I help you?"}]
-          },
-          {
-            role: "user",
-            parts: [{ text: prompt2 }]
-          },
+          },        
         ],
         context:"sos un agente IA de nogadev, te llamas Kike, estas para ayudar a los usuarios de su pagina",
         generationConfig:{
@@ -142,37 +135,28 @@ export class PromptServices {
     }
   }
 
-  async postResponse(res, payload, si){
+  async postResponse(res, req){
     try {
-      const message = payload.message;
-      const parsedMessage = parseMessage(message)
-      const redisItem = await redis.getItem(parsedMessage, res)
+      const {headers,body} = req
+      const token = headers.authorization
+      const message = body.message;
+      const parsedToken = token.split('Bearer ')[1]
+      const redisItemToken = await redis.getItem(parsedToken)      
 
-      if (!redisItem){
-        const data = await this.getAll();
-        const dataPrev = data.map(item => {
-          const {_id, ...Data } = item; 
-          return Data._doc.Data;
-        });
-        const dataString = JSON.stringify(dataPrev);
-        const response = await this.geminiGeneration(message, dataString);
-        const regexChiste = /\b(chiste|broma|gracia|burla|chistorete|chascarrillo|joda|joke|funny|humor|laugh|jest|wit)\b/i;
-        if (!regexChiste.test(message)) {
-          await redis.createItem( response,parsedMessage, res)
-          if (history.length === 6) {
-            for (let i = 0; i <= 4; i++) {
-              history.shift()
-            };
-          };
-          history.push(message);
-          history.push(response);
-        };
+      const data = await this.getAll();
+      const dataPrev = data.map(item => {
+        const {_id, ...Data } = item; 
+        return Data._doc.Data;
+      });
+      const dataString = JSON.stringify(dataPrev);
+      const response = await this.geminiGeneration(message, dataString, redisItemToken);
+      if (!redisItemToken) {
+        await redis.createItem(`  Message: ${message}, Response: ${response}`, parsedToken)
+      }else{
+        await redis.updateItem(parsedToken,`  Message: ${message}, Response: ${response}`)
+      }
         return res.json({response});
-      }
-      else{
-        return res.json({response: redisItem})
-      }
-    } catch (error) {
+      } catch (error) {
       return res.status(400).json({error: error.message})
     }
   }
