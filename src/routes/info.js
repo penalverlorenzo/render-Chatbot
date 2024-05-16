@@ -10,7 +10,7 @@ infoRouter.use(verificationToken);
 
 infoRouter.post('/info', async (req, res) => {
   try {
-    const created = await service.postResponse(res, req.body)
+    const created = await service.postResponse(res, req)
     return created
   } catch (error) {
     console.log(error);
