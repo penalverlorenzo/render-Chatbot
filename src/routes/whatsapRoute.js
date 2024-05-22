@@ -5,15 +5,15 @@ import { recievedMsg, verifyToken } from '../controllers/whatsappcontrollers';
 
 
 
-export const whatsappRouter = Router()
-whatsappRouter.get("/", async (req,res)=> {
+export const whatsapprouter = Router()
+whatsapprouter.get("/", async (req,res)=> {
     const response = verifyToken()
     return response
 })
 
-// whatsappRouter.get("/", verifyToken)
-// whatsappRouter.post("/", RecievedMsg)
-whatsappRouter.post("/", (req,res)=>{
+// whatsapprouter.get("/", verifyToken)
+// whatsapprouter.post("/", RecievedMsg)
+whatsapprouter.post("/", (req,res)=>{
     const response = recievedMsg()
     return response
 })

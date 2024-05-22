@@ -7,8 +7,8 @@ import bodyParser from 'body-parser';
 import { config } from './config/index.js';
 import { tokenRouter } from './routes/tokens.js';
 import { redisRouter } from './routes/redisRouter.js';
+import { whatsapprouter } from './routes/whatsaproute';
 
-import { whatsappRouter } from './routes/whatsaproute.js';
 
 
 const app = express();
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 app.use('/api/v1', tokenRouter)
 app.use('/api/v1', infoRouter)
 app.use('/api/v1', redisRouter)
-app.use('/api/v1/whatsapp', whatsappRouter)
+app.use('/api/v1/whatsapp', whatsapprouter)
 
 
 app.listen(PORT, () => {
