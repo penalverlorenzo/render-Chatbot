@@ -3,7 +3,6 @@ export const MessageText = ( textResponse, number ) => {
     "messaging_product": "whatsapp",
     "to": number,
     "text": {
-      "preview": true,
       "body": textResponse
     },
     "type": "text",

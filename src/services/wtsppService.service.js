@@ -1,10 +1,14 @@
 import https from "https";
+import { MessageText, messageButtons, messageList } from "../shared/whatsApp.modes.js";
+import { config } from "../config/index.js";
+import axios from "axios";
+import { PromptServices } from "./prompt.service.js";
 
-export class WtsppService {
+export class WtsppService extends PromptServices{
   VerifyToken = ( req, res) => {
 
     try {
-      const accessToken = "Z9ES8DXF7CG6V5JHBKN";
+      const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImlhdCI6MTcxNjQwMzYzNCwiZXhwIjoxNzE2NDQ2ODM0fQ.KIZO2MQjACmubN-8eIsTpttjxD7mKPRVAE0t1MBn3DE"; //!generar un token seguro
       const token = req.query["hub.verify_token"];
       const challenge = req.query["hub.challenge"];
   
@@ -34,7 +38,7 @@ export class WtsppService {
         if (text !== "") {
           console.log(text);
           console.log(number);
-          await processMessage.Process(text, number)
+          await this.Process(text, 542617506693); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
         }
       }
       res.send("EVENT_RECEIVED")
@@ -65,31 +69,81 @@ export class WtsppService {
     return text;
   }
 
-  SendMessageWtspp = (data) => {
+  SendMessageWtspp = async (data) => {
 
-    const options = {    
-      host: "graph.facebook.com",
-      path: "v19.0/321829781013280/messages",
-      method: "POST",
-      body: data,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer 'token permanente'"
-      }
-    };
-  
-    const req = https.request(options, res => {
-      res.on("data", d=> {
-        process.stdout.write(d);
-      })
-    });
-  
-    req.on("error", err => {
-      console.error(err);
-    }) 
-  
-    req.write(data);
-    req.end();
+    try {
+      const url = 'https://graph.facebook.com/v19.0/321829781013280/messages';
+      const token = config.tokenWtspp; //! conseguir token permanente
+
+      await axios.post(url, data, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log('Mensaje enviado:', data);
+    } catch (error) {
+      console.error('Error al enviar el mensaje:', error.response ? error.response.data : error.message);
+    }
   }
+
+  Process = async ( textUser, number)=> {
+    textUser= textUser.toLowerCase();
+    let models = [];
   
-}
+  
+    //#region sin gemini
+    // //Hola que tal
+    // if (textUser.includes("hola")) {
+    //   //SALUDAR
+    //   const model = MessageText("hello, nice to me you", number);
+    //   models.push(model);
+    //   const listModel = MessageText("you are welcome", number);
+    //   models.push(listModel);
+    // } else if (textUser.includes("gracias")) {
+    //   const model = MessageText("you are welcome", number);
+    //   models.push(model);
+    // } else if (textUser.includes("adios")) {
+    //   const model = MessageText("bye bye", number);
+    //   models.push(model);
+    // } else if (textUser.includes("comprar")) {
+    //   const model = messageButtons("Que quieres comprar?", number);
+    //   models.push(model);
+    // } else if (textUser.includes("vender")) {
+    //   const model = MessageText("puedes vender x aca", number);
+    //   models.push(model);
+    // } else {
+    //   const model =  MessageText("I do not know", number);
+    //   models.push(model);
+    // }
+    // #endregion
+  
+    // #region con gemini
+    try { //! refactorisar para poder utilizar el sistema de identificacion de historial.
+      let data = await this.getAll();
+        //! pra crear los historiales de los chat en redis se van a hacer con el numero de celular
+      const dataPrev = data.map(item => {
+        const {_id, ...Data } = item; 
+        return Data._doc.Data;
+      });
+      const dataString = JSON.stringify(dataPrev);
+      const response = await this.geminiGeneration(textUser, dataString, "prueva whatsapp");
+        if (response !== null) {
+          const model = MessageText(response, number);
+          models.push(model)
+        } else {
+          const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
+          models.push(model)
+        }
+        models.forEach(model => {
+          this.SendMessageWtspp(model);
+          console.log({model});
+        })
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    
+  }
+  // #endregion

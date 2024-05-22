@@ -8,13 +8,13 @@ export const whatsAppRoutes = Router();
 const service = new WtsppService();
 
 whatsAppRoutes.get('/', async (req, res) => {
-  const user = await service.VerifyToken(req, res)
-  return user;
+  const tokenVerify = await service.VerifyToken(req, res)
+  return tokenVerify;
 })
 
 whatsAppRoutes.post('/', async (req, res) => {
-  const user = await service.createUser(req, res)
-  return user;
+  const message = await service.ReceivedMessage(req, res)
+  return message;
 })
 
 
