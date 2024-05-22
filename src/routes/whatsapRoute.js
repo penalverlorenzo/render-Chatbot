@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { RecievedMsg, verifyToken } from '../controllers/whatsappcontrollers';
+import { recievedMsg, verifyToken } from '../controllers/whatsappcontrollers';
 // import { verifyToken, RecievedMsg } from '../controllers/whatsappcontrollers.js';
 
 
@@ -14,7 +14,7 @@ whatsappRouter.get("/", async (req,res)=> {
 // whatsappRouter.get("/", verifyToken)
 // whatsappRouter.post("/", RecievedMsg)
 whatsappRouter.post("/", (req,res)=>{
-    const response = RecievedMsg()
+    const response = recievedMsg()
     return response
 })
 

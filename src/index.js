@@ -7,7 +7,8 @@ import bodyParser from 'body-parser';
 import { config } from './config/index.js';
 import { tokenRouter } from './routes/tokens.js';
 import { redisRouter } from './routes/redisRouter.js';
-import { whatsappRouter } from './routes/whatsapRoute.js';
+
+import { whatsappRouter } from './routes/whatsaproute.js';
 
 
 const app = express();
