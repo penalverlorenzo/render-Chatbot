@@ -38,7 +38,7 @@ export class WtsppService extends PromptServices{
         if (text !== "") {
           console.log(text);
           console.log(number);
-          await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+          await this.Process(text, 5492612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
         }
       }
       res.send("EVENT_RECEIVED")
