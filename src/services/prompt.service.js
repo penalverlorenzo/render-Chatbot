@@ -1,14 +1,14 @@
 import Boom  from "@hapi/boom";
-import { promptModel } from "../models/prompt.model.js";
+import { promptModel, promptPrivateModel } from "../models/prompt.model.js";
 import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import jwt from "jsonwebtoken"
 import * as crypto from 'node:crypto'
 import { RedisServices } from "./redis.service.js";
+import { userModel } from "../models/user.model.js";
+import { compare } from "bcrypt";
 const redis = new RedisServices()
-
-const history = []
 
 const parseMessage = (message) => {
   // Expresiones Regulares para cada posible caso de vocales con caracteres especiales
@@ -39,6 +39,19 @@ export class PromptServices {
       throw new Boom.badRequest(error);
     }
   };
+
+  async getAllPrivate() {
+    try {
+      const dataPublic = await promptModel.find();
+      const dataPrivate = await promptPrivateModel.find();
+      const data = [...dataPublic, ...dataPrivate];
+      return data;
+    } catch (error) {
+      throw new Boom.badRequest(error);
+    }
+  };
+
+  
 
   async dataComparison(message, dataString) {
     const hf = new HfInference(config.iaKey);
@@ -135,15 +148,19 @@ export class PromptServices {
     }
   }
 
-  async postResponse(res, req){
+  async postResponse(res, req, accessible){
     try {
       const {headers,body} = req
       const token = headers.authorization
       const message = body.message;
       const parsedToken = token.split('Bearer ')[1]
       const redisItemToken = await redis.getItem(parsedToken)      
+      let data = await this.getAll();
 
-      const data = await this.getAll();
+      if (accessible === "private") {
+        data = await this.getAllPrivate();
+      }
+
       const dataPrev = data.map(item => {
         const {_id, ...Data } = item; 
         return Data._doc.Data;
@@ -165,28 +182,58 @@ export class PromptServices {
   // Generar token
   async generarToken(req, res) {
     try {
-      const { jwtSecret } = req.body;
+      const { jwtSecret, password, email } = req.body;
       const decoded = crypto.createHash('sha256').update(config.jwtSecret).digest('hex');
-
+      
       if (decoded !== jwtSecret ) {
         return res.status(401).json({ mensaje: 'Clave secreta incorrecta' });
       }
-      const token = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
-      const refreshToken = jwt.sign({}, config.jwtSecret, { expiresIn: '12h' });
+      
+      if (password || email) {
+        const findUser = await userModel.findOne({ email });
+        if (!findUser){
+          return res.status(404).json({ mensaje: 'USER_NOT_FOUND' });
+        }
+        
+        const matchPassword = await compare(password, findUser.password);
+        
+        if (!matchPassword){
+          return res.status(403).json({ mensaje: 'PASSWORD_INCORRECT' });
+        }
+        
+        const token = jwt.sign({ id: findUser._id, role: findUser.role}, config.jwtSecret, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({role: findUser.role}, config.jwtSecret, { expiresIn: '12h' });
+        
+        const data = {
+          user: {
+            email: findUser.email,
+            role: findUser.role,
+          },
+          token,
+          refreshToken
+        };
+    
+        return res.json({data});
+      }
+
+      const token = jwt.sign({role: "user"}, config.jwtSecret, { expiresIn: '15m' });
+      const refreshToken = jwt.sign({role: "user"}, config.jwtSecret, { expiresIn: '12h' });
+
       return res.json({ token, refreshToken });
     } catch (error) {
-      return res.status(500).json({ mensaje: 'Error al generar el token' });
+      return res.status(500).json({ mensaje: 'Error al generar el token' + error });
     }
   }
 
   async refreshToken(req, res) {
     try {
       const { token } = req.body;
-      jwt.verify(token, config.jwtSecret);
       if (!token) {
         return res.status(401).json({message: 'Token not provided.'})
       }
-      const refreshedToken = jwt.sign({}, config.jwtSecret, { expiresIn: '15m' });
+      const verifyToken = jwt.verify(token, config.jwtSecret);
+
+      const refreshedToken = jwt.sign({role: verifyToken.role}, config.jwtSecret, { expiresIn: '15m' });
       return res.json({ refreshedToken });
     } catch (error) {
       return res.status(401).json({message: 'Invalid Token'})

@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { PromptServices } from '../services/prompt.service.js';
-import { verificationToken } from '../middlewares/verificationToken.js';
+import { PromptServices } from '../../services/prompt.service.js';
+import { verificationToken } from '../../middlewares/verificationToken.js';
 
 export const infoRouter = Router();
 
@@ -10,12 +10,13 @@ infoRouter.use(verificationToken);
 
 infoRouter.post('/info', async (req, res) => {
   try {
-    const created = await service.postResponse(res, req)
+    const created = await service.postResponse(res, req, "public")
     return created
   } catch (error) {
     console.log(error);
   }
 })
+
 
 infoRouter.get('/info', async (req, res) => {
   try {

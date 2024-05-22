@@ -12,6 +12,8 @@ const promptSchema = new Schema({
 
 export const promptModel = model("info", promptSchema)
 
+export const promptPrivateModel = model("info_private", promptSchema)
+
 const redisSchema = new Schema({
 
     // data: {type: String, required: true}, 

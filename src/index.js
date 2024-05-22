@@ -2,13 +2,13 @@ import './db/database.js';
 import express from 'express';
 import cors from 'cors';
 
-import { infoRouter, } from './routes/info.js';
+import { infoRouter, } from './routes/public/info.js';
 import bodyParser from 'body-parser';
 import { config } from './config/index.js';
 import { tokenRouter } from './routes/tokens.js';
 import { redisRouter } from './routes/redisRouter.js';
-import { whatsapprouter } from './routes/whatsaproute';
-
+import { userRouter } from './routes/private/users.js';
+import { infoPrivateRouter } from './routes/private/infoPrivate.js';
 
 
 const app = express();
@@ -26,9 +26,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use('/api/v1', tokenRouter)
-app.use('/api/v1', infoRouter)
 app.use('/api/v1', redisRouter)
-app.use('/api/v1/whatsapp', whatsapprouter)
+app.use('/api/v1', infoRouter)
+app.use('/api/v1/private', userRouter)
+app.use('/api/v1/private', infoPrivateRouter)
 
 
 app.listen(PORT, () => {
