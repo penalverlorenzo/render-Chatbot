@@ -3,6 +3,7 @@ import {Router} from 'express';
 import {RecievedMsg,verifyToken} from '../../src/controllers/whatsappcontrollers.js';
 
 
+
 export const whatsappRouter = Router()
 whatsappRouter.get("/", async (req,res)=> {
     const response = verifyToken()
