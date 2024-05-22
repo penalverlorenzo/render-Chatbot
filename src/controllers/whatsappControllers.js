@@ -1,9 +1,10 @@
-export const verifyToken = (req,res) => {
+const verifyToken = (req,res) => {
     res.send('Verified')
 }
 
 
-export const RecievedMsg = (req,res) => {
+const RecievedMsg = (req,res) => {
     res.send('Recieved')
 }
 
+export {RecievedMsg, verifyToken}
