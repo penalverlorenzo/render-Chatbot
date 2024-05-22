@@ -5,14 +5,14 @@ import {RecievedMsg,verifyToken} from '../../src/controllers/whatsappcontrollers
 
 export const whatsappRouter = Router()
 whatsappRouter.get("/", async (req,res)=> {
-    const res = verifyToken()
-    return res
+    const response = verifyToken()
+    return response
 })
 
 // whatsappRouter.get("/", verifyToken)
 // whatsappRouter.post("/", RecievedMsg)
-whatsappRouter.post("/", ()=>{
-    const res = RecievedMsg()
-    return res
+whatsappRouter.post("/", (req,res)=>{
+    const response = RecievedMsg()
+    return response
 })
 
