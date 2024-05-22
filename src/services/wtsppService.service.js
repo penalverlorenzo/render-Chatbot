@@ -29,12 +29,13 @@ export class WtsppService extends PromptServices{
       const changes = (entry["changes"])[0];
       const value = changes["value"];
       const messageObject = value["messages"]; //con esto encontramos el mesaje
+      console.log({entry,changes});
   
       if (typeof messageObject != "undefined") {
         const messages = messageObject[0];
         const number = messages["from"]
         const text = this.getTextMessage(messages)
-
+        console.log({text});
         if (text !== "") {
           console.log(text);
           console.log(number);
