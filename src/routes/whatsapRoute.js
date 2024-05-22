@@ -1,6 +1,6 @@
 import {Router} from 'express';
 // import { verifyToken, RecievedMsg } from '../controllers/whatsappcontrollers.js';
-import * as wc from '../controllers/whatsappcontrollers.js';
+import * as wc from '../../src/controllers/whatsappcontrollers.js';
 
 
 export const whatsappRouter = Router()
