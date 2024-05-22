@@ -1,6 +1,7 @@
 import {Router} from 'express';
+import { RecievedMsg, verifyToken } from '../controllers/whatsappcontrollers';
 // import { verifyToken, RecievedMsg } from '../controllers/whatsappcontrollers.js';
-import {RecievedMsg,verifyToken} from '../../src/controllers/whatsappcontrollers.js';
+
 
 
 
