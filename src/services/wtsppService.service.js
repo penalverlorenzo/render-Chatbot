@@ -72,7 +72,7 @@ export class WtsppService extends PromptServices{
   SendMessageWtspp = async (data) => {
 
     try {
-      const url = 'https://graph.facebook.com/v19.0/321829781013280/messages';
+      const url = 'https://graph.facebook.com/v19.0/325486840648107/messages';
       const token = config.tokenWtspp; //! conseguir token permanente
 
       await axios.post(url, data, {
