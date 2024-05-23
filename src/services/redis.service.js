@@ -7,15 +7,16 @@ const client = createClient({
         port: config.redisPort
     }
 });
-const redisClient = await client.connect()
+await client.connect()
 
 export class RedisServices {
-async createItem(value,key){
-    const response = await client.set(key, value, {EX: 300})
+async createItem(value,key, exp){
+    const response = await client.set(key, value, {EX: exp})
     return response
 }
-async updateItem(key, value){
+async updateItem(value, key){
     const response = await client.APPEND(key, value)
+    console.log({"Updating Item": response});
     return response
 }
 async getItem(key){
