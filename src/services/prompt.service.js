@@ -108,13 +108,19 @@ export class PromptServices {
     try {
       const genAI = new GoogleGenerativeAI(config.iaKey)
       const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      //#region English prompt
+      // Answer the message using this information: ${dataString} (This is Not a History).
+      // Take the message, identify the language, and respond in the same language.
+      // You must always answer in the language the messages are in, otherwise you will recieve a punishment.
+      // In case the message is not related to the information, let them know that you're not designed to respond to that.
+      // If they ask you for a joke, tell a short one related to programming , respond in the language the message is in.
+      //#endregion English prompt
       const prompt = `
-      Answer the message using this information: ${dataString} (This is Not a History).
-      Take the message, identify the language, and respond in the same language.
-      You must always answer in the language the messages are in, otherwise you will recieve a punishment.
-      In case the message is not related to the information, let them know that you're not designed to respond to that.
-      If they ask you for a joke, tell a short one related to programming , respond in the language the message is in.
-      `;
+      Responde el mensaje usando esta información: ${dataString} (Traducela al idioma del mensaje).
+      Toma el mensaje, identifica el idioma y responde en el mismo idioma del mensaje.
+      Debes siempre responder en el idioma en el que esté el mensaje, de lo contrario recibiras una penalización máxima.
+      En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
+      Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el mismo idioma que el mensaje.`;
       const prompt2 = `
       Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, una vez completado, retorna tu respuesta`;
       const chat = model.startChat({
