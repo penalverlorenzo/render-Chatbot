@@ -8,7 +8,6 @@ export class WtsppService extends PromptServices{
   VerifyToken = ( req, res) => {
     try {
       const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImlhdCI6MTcxNjQwMzYzNCwiZXhwIjoxNzE2NDQ2ODM0fQ.KIZO2MQjACmubN-8eIsTpttjxD7mKPRVAE0t1MBn3DE"; //!generar un token seguro
-      console.log({accessToken, "Dentro de VerifyToken": req.query});
       const token = req.query["hub.verify_token"];
       const challenge = req.query["hub.challenge"];
   
@@ -26,19 +25,6 @@ export class WtsppService extends PromptServices{
 
   ReceivedMessage = async (req, res) => {
     try {
-      // console.log("Inside RecievedMsg", {req: req.body});
-      // const alternativeMsg = req.body.text.body
-      
-      // if (alternativeMsg) {
-      //   console.log("Inside RecievedMsg with AltMsg");
-      //   const text = this.getTextMessage(alternativeMsg)
-      //   if (text != "") {
-      //     await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
-          
-      //   }else{
-      //     await this.Process(alternativeMsg, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
-      //   }
-      // }else{
         console.log("Inside RecievedMsg without AltMsg");
         const entry = (req.body["entry"])[0];
       const changes = (entry["changes"])[0];
@@ -48,15 +34,15 @@ export class WtsppService extends PromptServices{
         const messages = messageObject[0];
         const number = messages["from"]
           const text = this.getTextMessage(messages)
-          console.log({text});
           if (text !== "") {
             console.log(text);
             console.log(number);
+            const parsedNumber = number.slice(0,2) + number.slice(3)
+            console.log({parsedNumber});
             await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
           }
 
       }
-      // }
       res.send("EVENT_RECEIVED")
     } catch (error) {
       console.log(error);
