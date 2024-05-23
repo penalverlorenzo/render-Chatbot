@@ -16,7 +16,6 @@ async createItem(value,key, exp){
 }
 async updateItem(value, key){
     const response = await client.APPEND(key, value)
-    console.log({"Updating Item": response});
     return response
 }
 async getItem(key){

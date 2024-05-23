@@ -26,7 +26,6 @@ export class WtsppService extends PromptServices {
 
   ReceivedMessage = async (req, res) => {
     try {
-      console.log("Inside RecievedMsg without AltMsg");
       const entry = (req.body["entry"])[0];
       const changes = (entry["changes"])[0];
       const value = changes["value"];
@@ -146,7 +145,6 @@ export class WtsppService extends PromptServices {
         models.push(model)
       }
       if (!redisItemToken) {
-        console.log({"CreateItem":redisItemToken});
         await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number, 300)
       } else {
         console.log({"UpdateItem":redisItemToken});
