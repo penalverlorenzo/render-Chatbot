@@ -30,10 +30,10 @@ export class WtsppService extends PromptServices{
       if (alternativeMsg) {
         const text = this.getTextMessage(alternativeMsg)
         if (text != "") {
-          await this.Process(text, req.body.to); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+          await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
           
         }else{
-          await this.Process(alternativeMsg, req.body.to); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+          await this.Process(alternativeMsg, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
         }
       }else{
         const entry = (req.body["entry"])[0];
