@@ -3,6 +3,7 @@ import { MessageText, messageButtons, messageList } from "../shared/whatsApp.mod
 import { config } from "../config/index.js";
 import axios from "axios";
 import { PromptServices } from "./prompt.service.js";
+import { RedisServices } from "./redis.service.js";
 
 export class WtsppService extends PromptServices{
   VerifyToken = ( req, res) => {
@@ -39,7 +40,7 @@ export class WtsppService extends PromptServices{
             console.log(number);
             const parsedNumber = number.slice(0,2) + number.slice(3)
             console.log({parsedNumber});
-            await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+            await this.Process(text, parsedNumber); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
           }
 
       }
@@ -126,13 +127,16 @@ console.log({data});
     // #region con gemini
     try { //! refactorisar para poder utilizar el sistema de identificacion de historial.
       let data = await this.getAll();
+      const redis = new RedisServices()
+      const redisItemToken = redis.getItem(number)
+      
         //! pra crear los historiales de los chat en redis se van a hacer con el numero de celular
       const dataPrev = data.map(item => {
         const {_id, ...Data } = item; 
         return Data._doc.Data;
       });
       const dataString = JSON.stringify(dataPrev);
-      const response = await this.geminiGeneration(textUser, dataString, "prueva whatsapp");
+      const response = await this.geminiGeneration(textUser, dataString, redisItemToken);
         if (response !== null) {
           const model = MessageText(response, number);
           models.push(model)
@@ -144,6 +148,11 @@ console.log({data});
           this.SendMessageWtspp(model);
           console.log({model});
         })
+        if (!redisItemToken) {
+          await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number)
+        }else{
+          await redis.updateItem(number,`  Message: ${textUser}, Response: ${response}`)
+        }
       } catch (error) {
         console.error(error);
       }
