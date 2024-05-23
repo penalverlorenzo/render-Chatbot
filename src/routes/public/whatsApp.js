@@ -14,6 +14,7 @@ whatsAppRoutes.get('/', async (req, res) => {
 
 whatsAppRoutes.post('/', async (req, res) => {
   const message = await service.ReceivedMessage(req, res)
+  console.log({message});
   return message;
 })
 

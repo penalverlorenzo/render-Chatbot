@@ -25,26 +25,38 @@ export class WtsppService extends PromptServices{
 
   ReceivedMessage = async (req, res) => {
     try {
-      const entry = (req.body["entry"])[0];
+      const alternativeMsg = req.body.text.body
+
+      if (alternativeMsg) {
+        const text = this.getTextMessage(alternativeMsg)
+        if (text != "") {
+          await this.Process(text, req.body.to); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+          
+        }else{
+          await this.Process(alternativeMsg, req.body.to); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+        }
+      }else{
+        const entry = (req.body["entry"])[0];
       const changes = (entry["changes"])[0];
       const value = changes["value"];
       const messageObject = value["messages"]; //con esto encontramos el mesaje
-      console.log({entry,changes});
-  
-      if (typeof messageObject != "undefined") {
+        if (typeof messageObject != "undefined") {
         const messages = messageObject[0];
         const number = messages["from"]
-        const text = this.getTextMessage(messages)
-        console.log({text});
-        if (text !== "") {
-          console.log(text);
-          console.log(number);
-          await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
-        }
+          const text = this.getTextMessage(messages)
+          console.log({text});
+          if (text !== "") {
+            console.log(text);
+            console.log(number);
+            await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
+          }
+
+      }
       }
       res.send("EVENT_RECEIVED")
     } catch (error) {
-      res.send("EVENT_RECEIVED")
+      console.log(error);
+      res.send("EVENT_NOT_RECEIVED")
     }
   }
 
@@ -71,7 +83,7 @@ export class WtsppService extends PromptServices{
   }
 
   SendMessageWtspp = async (data) => {
-
+console.log({data});
     try {
       const url = 'https://graph.facebook.com/v19.0/325486840648107/messages';
       const token = config.tokenWtspp; //! conseguir token permanente
