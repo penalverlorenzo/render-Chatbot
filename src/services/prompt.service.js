@@ -116,7 +116,7 @@ export class PromptServices {
       // If they ask you for a joke, tell a short one related to programming , respond in the language the message is in.
       //#endregion English prompt
       const prompt = `
-      Responde el mensaje usando esta información: ${dataString} (Traducela al idioma del mensaje).
+      Responde el mensaje usando esta información: ${dataString}.
       Toma el mensaje, identifica el idioma y responde en el mismo idioma del mensaje.
       Debes siempre responder en el idioma en el que esté el mensaje, de lo contrario recibiras una penalización máxima.
       En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
