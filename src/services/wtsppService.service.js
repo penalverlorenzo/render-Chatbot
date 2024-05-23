@@ -25,9 +25,11 @@ export class WtsppService extends PromptServices{
 
   ReceivedMessage = async (req, res) => {
     try {
+      console.log("Inside RecievedMsg");
       const alternativeMsg = req.body.text.body
-
+      
       if (alternativeMsg) {
+        console.log("Inside RecievedMsg with AltMsg");
         const text = this.getTextMessage(alternativeMsg)
         if (text != "") {
           await this.Process(text, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
@@ -36,6 +38,7 @@ export class WtsppService extends PromptServices{
           await this.Process(alternativeMsg, 542612079772); //! a la hora de adquirir el numero en whts me lo trae con un 9 un y en la web no lo identifica apesar de ser el mismo investigar 
         }
       }else{
+        console.log("Inside RecievedMsg without AltMsg");
         const entry = (req.body["entry"])[0];
       const changes = (entry["changes"])[0];
       const value = changes["value"];
