@@ -8,8 +8,8 @@ export const whatsAppRoutes = Router();
 const service = new WtsppService();
 
 whatsAppRoutes.get('/', async (req, res) => {
-  console.log({"verify": req.body});
-  const tokenVerify = await service.VerifyToken(req, res)
+  const tokenVerify =  service.VerifyToken(req, res)
+  console.log({tokenVerify});
   return tokenVerify;
 })
 

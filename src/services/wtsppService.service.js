@@ -6,20 +6,21 @@ import { PromptServices } from "./prompt.service.js";
 
 export class WtsppService extends PromptServices{
   VerifyToken = ( req, res) => {
-
     try {
       const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImlhdCI6MTcxNjQwMzYzNCwiZXhwIjoxNzE2NDQ2ODM0fQ.KIZO2MQjACmubN-8eIsTpttjxD7mKPRVAE0t1MBn3DE"; //!generar un token seguro
+      console.log({accessToken, "Dentro de VerifyToken": req.query});
       const token = req.query["hub.verify_token"];
       const challenge = req.query["hub.challenge"];
   
       if (challenge != null && token != null && token == accessToken) {
         res.send(challenge);
       }else {
-        res.status(400).send();
+        res.status(400).send("No Token");
       }
       
     } catch (error) {
-      res.status(400).send()
+      console.log(error);
+      res.status(400).send("Error: " + error)
     }
   }
 
@@ -100,6 +101,7 @@ console.log({data});
 
       console.log('Mensaje enviado:', data);
     } catch (error) {
+      console.log({error});
       console.error('Error al enviar el mensaje:', error.response ? error.response.data : error.message);
     }
   }
