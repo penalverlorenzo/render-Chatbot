@@ -62,11 +62,11 @@ export class WtsppService extends PromptServices {
       console.log({typeInteractive, interactiveObject});
 
       if (typeInteractive === "button_reply") {
-        console.log({'Texto siendo setteado': interactiveObject});
-        console.log({'Texto siendo setteado 2': interactiveObject["button_replay"]});
-        console.log({'Texto siendo setteado 2': interactiveObject["button_replay"]["title"]});
-        text = interactiveObject.button_replay.title
-        // text = (interactiveObject["button_replay"])["title"];
+        // console.log({'Texto siendo setteado': interactiveObject});
+        // console.log({'Texto siendo setteado 2': interactiveObject["button_reply"]});
+        // console.log({'Texto siendo setteado 3': interactiveObject["button_reply"]["title"]});
+        // text = interactiveObject.button_replay.title
+        text = (interactiveObject["button_reply"])["title"];
       } else if (typeInteractive === "list_reply") {
         text = (interactiveObject["list_reply"])["title"];
       } else {
