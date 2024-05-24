@@ -52,15 +52,21 @@ export class WtsppService extends PromptServices {
 
   getTextMessage = (message) => {
     let text = "";
+    console.log({message});
     const typeMessage = message["type"];
     if (typeMessage == "text") {
       text = (message["text"])["body"]
     } else if (typeMessage == "interactive") {
       const interactiveObject = message["interactive"];
       const typeInteractive = interactiveObject["type"];
+      console.log({typeInteractive, interactiveObject});
 
       if (typeInteractive === "button_reply") {
-        text = (interactiveObject["button_replay"])["title"];
+        console.log({'Texto siendo setteado': interactiveObject});
+        console.log({'Texto siendo setteado 2': interactiveObject["button_replay"]});
+        console.log({'Texto siendo setteado 2': interactiveObject["button_replay"]["title"]});
+        text = interactiveObject.button_replay.title
+        // text = (interactiveObject["button_replay"])["title"];
       } else if (typeInteractive === "list_reply") {
         text = (interactiveObject["list_reply"])["title"];
       } else {
