@@ -10,7 +10,7 @@ export const MessageText = ( textResponse, number ) => {
   return data;
 }
 
-export const messageButtons = ( question, number ) => {
+export const messageButtons = ( question, number, option1, option2 ) => {
   const data = JSON.stringify({
     "messaging_product": "whatsapp",
     "to": number,
@@ -26,14 +26,14 @@ export const messageButtons = ( question, number ) => {
             "type": "reply",
             "reply": {
             "id": "001",
-            "title": "Co-Founders",
+            "title": option1,
                   },
           },
           {
             "type": "reply",
             "reply": {
             "id": "002",
-            "title": "About Us",
+            "title": option2,
                   },
           }
         ]

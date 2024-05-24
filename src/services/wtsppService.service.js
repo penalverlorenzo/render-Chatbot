@@ -52,26 +52,20 @@ export class WtsppService extends PromptServices {
 
   getTextMessage = (message) => {
     let text = "";
-    console.log({message});
+    console.log({ message });
     const typeMessage = message["type"];
     if (typeMessage == "text") {
       text = (message["text"])["body"]
     } else if (typeMessage == "interactive") {
       const interactiveObject = message["interactive"];
       const typeInteractive = interactiveObject["type"];
-      console.log({typeInteractive, interactiveObject});
-
-      if (typeInteractive === "button_reply") {
-        // console.log({'Texto siendo setteado': interactiveObject});
-        // console.log({'Texto siendo setteado 2': interactiveObject["button_reply"]});
-        // console.log({'Texto siendo setteado 3': interactiveObject["button_reply"]["title"]});
-        // text = interactiveObject.button_replay.title
-        text = (interactiveObject["button_reply"])["title"];
-      } else if (typeInteractive === "list_reply") {
-        text = (interactiveObject["list_reply"])["title"];
-      } else {
-        console.log("sin mensajes");
-      }
+       if (typeInteractive === "button_reply") {
+          text = (interactiveObject["button_reply"])["title"];
+        } else if (typeInteractive === "list_reply") {
+         text = (interactiveObject["list_reply"])["title"];
+        } else {
+         console.log("sin mensajes");
+       }
     } else {
       console.log("sin mensajes");
     }
@@ -142,14 +136,18 @@ export class WtsppService extends PromptServices {
       });
       const dataString = JSON.stringify(dataPrev);
       const response = await this.geminiGeneration(textUser, dataString, redisItemToken);
-      if (/^(options|option|opciones|opsiones|opsion|opcion)\b/i.test(textUser)) {
-           const model = messageButtons("Opciones", number)
-           models.push(model)
+      if (/^(options|option)\b/i.test(textUser)) {
+        const model = messageButtons("Here are your options:", number, "Co-Founders", "About Us")
+        models.push(model)
+      }
+      else if (/^(opciones|opsiones|opsion|opcion)\b/i.test(textUser)) {
+        const model = messageButtons("Aquí están las opciones:", number, "Cofundadores", "Sobre Nogadev")
+        models.push(model)
       }
       else if (response !== null) {
         const model = MessageText(response, number);
         models.push(model)
-        
+
       } else {
         const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
         models.push(model)
@@ -157,8 +155,8 @@ export class WtsppService extends PromptServices {
       if (!redisItemToken) {
         await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number, 300)
       } else {
-        console.log({"UpdateItem":redisItemToken});
-        await redis.updateItem(`  Message: ${textUser}, Response: ${response}`, number )
+        console.log({ "UpdateItem": redisItemToken });
+        await redis.updateItem(`  Message: ${textUser}, Response: ${response}`, number)
       }
       models.forEach(async (model) => {
         this.SendMessageWtspp(model);
