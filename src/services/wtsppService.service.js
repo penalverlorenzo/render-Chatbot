@@ -136,7 +136,11 @@ export class WtsppService extends PromptServices {
       });
       const dataString = JSON.stringify(dataPrev);
       const response = await this.geminiGeneration(textUser, dataString, redisItemToken);
-      if (response !== null) {
+      if (/^(options|option|opciones|opsiones|opsion|opcion)\b/i.test(textUser)) {
+           const model = messageButtons("Opciones", number)
+           models.push(model)
+      }
+      else if (response !== null) {
         const model = MessageText(response, number);
         models.push(model)
         

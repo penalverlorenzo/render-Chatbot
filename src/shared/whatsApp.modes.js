@@ -26,14 +26,14 @@ export const messageButtons = ( question, number ) => {
             "type": "reply",
             "reply": {
             "id": "001",
-            "title": "si",
+            "title": "Co-Founders",
                   },
           },
           {
             "type": "reply",
             "reply": {
             "id": "002",
-            "title": "no",
+            "title": "About Us",
                   },
           }
         ]
