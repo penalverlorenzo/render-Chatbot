@@ -1,16 +1,18 @@
 import Boom from "@hapi/boom";
-import { promptModel, promptPrivateModel } from "../models/prompt.model.js";
-import { config } from "../config/index.js";
 import { HfInference } from "@huggingface/inference";
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import jwt from "jsonwebtoken"
 import * as crypto from 'node:crypto'
+
+import { promptModel, promptPrivateModel } from "../models/prompt.model.js";
+import { config } from "../config/index.js";
 import { RedisServices } from "./redis.service.js";
 import { userModel } from "../models/user.model.js";
 import { compare } from "bcrypt";
-import { pineconeDB } from "../db/pineconedb.js";
+import { HistoryServices } from './history.service.js';
+// import { pineconeDB } from "../db/pineconedb.js";
 const redis = new RedisServices()
-
+const history = new HistoryServices()
 const parseMessage = (message) => {
   // Expresiones Regulares para cada posible caso de vocales con caracteres especiales
   const vowelCaseA = /[áÁàâÀÂäÄãÃ]/g;
@@ -108,7 +110,7 @@ export class PromptServices {
   async geminiGeneration(message, dataString, history, count = 0) {
     try {
       const genAI = new GoogleGenerativeAI(config.iaKey)
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" }) 
       //#region English prompt
       // Answer the message using this information: ${dataString} (This is Not a History).
       // Take the message, identify the language, and respond in the same language.
@@ -157,13 +159,21 @@ export class PromptServices {
 
   async postResponse(res, req, accessible) {
     try {
+      //#region Intento de Embed con geminiPro
+      // const genAI = new GoogleGenerativeAI(config.iaKey)
+      // const model = genAI.getGenerativeModel({ model: "gemini-pro" }) 
+      // const embededMessage = await model.embedContent(message, "retrieval_query")
+      // console.log({embededMessage});
+      // const embededResponse = await model.embedContent(response, "retrieval_query")
+      // console.log({embededResponse});
+      //#endregion
       const { headers, body } = req
       const token = headers.authorization
       const message = body.message;
       const parsedToken = token.split('Bearer ')[1]
       const redisItemToken = await redis.getItem(parsedToken)
       let data = await this.getAll();
-      const pineconeIndex = pineconeDB.Index('maindatabase')
+      // const pineconeIndex = pineconeDB.Index('maindatabase')
 
       if (accessible === "private") {
         data = await this.getAllPrivate();
@@ -177,14 +187,15 @@ export class PromptServices {
       const response = await this.geminiGeneration(message, dataString, redisItemToken);
       const isMemoryFull = await redis.isMemoryFull(parsedToken)
       if (isMemoryFull) {
-        console.log('Llena', {isMemoryFull});
-        redis.emptyMemory(parsedToken)
+        redis.deleteItem(parsedToken)
       }
+      
       if (!redisItemToken) {
-        // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1, 0.3], metadata: { message: message, response: response } }])
+        // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
+        await history.createHistory(parsedToken,message,response)
         await redis.createItem(parsedToken ,`  Message: ${message}, Response: ${response}`)
       } else {
-        // await pineconeIndex.namespace('history').update({ id: parsedToken, values: [0.1, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1, 0.3], metadata: { message: message, response: response } })
+        await history.updateHistory(parsedToken,message,response)
         await redis.updateItem(parsedToken, `  Message: ${message}, Response: ${response}`)
       }
 

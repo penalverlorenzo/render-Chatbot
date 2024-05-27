@@ -29,15 +29,15 @@ async isMemoryFull (token){
     const usedMemory =  usedMemoryMatch? parseInt(usedMemoryMatch[1], 10) : 0;
     // const maxMemory = 2 * 1024 * 1024
     const userHistoryMemory = await client.memoryUsage(token)
-    console.log({memoryInfo, usedMemory});
-    if (usedMemory < userHistoryMemory) {
+    if ( (usedMemory/250) < userHistoryMemory ) {
+        // console.log({usedMemory: usedMemory/250 ,userHistoryMemory});
         return true
     }else{
-        // console.log({memoryInfo, usedMemory});
+        // console.log({usedMemory: usedMemory/250 ,userHistoryMemory});
         return false
     }
 }
-async emptyMemory (token){
+async deleteItem (token){
     const response = await client.DEL(token)
     return response
 }

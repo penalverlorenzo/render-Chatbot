@@ -14,15 +14,13 @@ export const promptModel = model("info", promptSchema)
 
 export const promptPrivateModel = model("info_private", promptSchema)
 
-const redisSchema = new Schema({
-
-    // data: {type: String, required: true}, 
-    // Dentro de data van a ver un un objeto en dondw va a tener tola informacion.
-    key: { type: String, require: true },
-    value: { type: String, require: true }
+const historySchema = new Schema({
+    historyId: {type: String, required: true}, 
+    message: { type: Array, require: true },
+    response: { type: Array, require: true }
 });
 
-export const redisModel = model("redis", redisSchema)
+export const historyModel = model("history", historySchema)
 
 
 
