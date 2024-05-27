@@ -153,7 +153,7 @@ export class WtsppService extends PromptServices {
         models.push(model)
       }
       if (!redisItemToken) {
-        await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number, 300)
+        await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number)
       } else {
         console.log({ "UpdateItem": redisItemToken });
         await redis.updateItem(`  Message: ${textUser}, Response: ${response}`, number)
