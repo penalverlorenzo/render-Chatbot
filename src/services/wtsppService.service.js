@@ -153,6 +153,7 @@ export class WtsppService extends PromptServices {
         const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
         models.push(model)
       }
+      
       const isMemoryFull = await redis.isMemoryFull(number)
       if (isMemoryFull) {
         redis.deleteItem(number)
