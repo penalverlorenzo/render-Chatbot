@@ -4,6 +4,7 @@ import { config } from "../config/index.js";
 import axios from "axios";
 import { PromptServices } from "./prompt.service.js";
 import { RedisServices } from "./redis.service.js";
+import { HistoryServices } from "./history.service.js";
 
 export class WtsppService extends PromptServices {
   VerifyToken = (req, res) => {
@@ -95,7 +96,7 @@ export class WtsppService extends PromptServices {
   Process = async (textUser, number) => {
     textUser = textUser.toLowerCase();
     let models = [];
-
+    const history = new HistoryServices()
 
     //#region sin gemini
     // //Hola que tal
@@ -152,11 +153,18 @@ export class WtsppService extends PromptServices {
         const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
         models.push(model)
       }
+      const isMemoryFull = await redis.isMemoryFull(parsedToken)
+      if (isMemoryFull) {
+        redis.deleteItem(parsedToken)
+      }
+      
       if (!redisItemToken) {
-        await redis.createItem(`  Message: ${textUser}, Response: ${response}`, number)
+        // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
+        await history.createHistory(parsedToken,message,response)
+        await redis.createItem(parsedToken ,`  Message: ${message}, Response: ${response}`)
       } else {
-        console.log({ "UpdateItem": redisItemToken });
-        await redis.updateItem(`  Message: ${textUser}, Response: ${response}`, number)
+        await history.updateHistory(parsedToken,message,response)
+        await redis.updateItem(parsedToken, `  Message: ${message}, Response: ${response}`)
       }
       models.forEach(async (model) => {
         this.SendMessageWtspp(model);
