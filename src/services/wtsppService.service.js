@@ -153,18 +153,18 @@ export class WtsppService extends PromptServices {
         const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
         models.push(model)
       }
-      const isMemoryFull = await redis.isMemoryFull(parsedToken)
+      const isMemoryFull = await redis.isMemoryFull(number)
       if (isMemoryFull) {
-        redis.deleteItem(parsedToken)
+        redis.deleteItem(number)
       }
       
       if (!redisItemToken) {
         // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
-        await history.createHistory(parsedToken,message,response)
-        await redis.createItem(parsedToken ,`  Message: ${message}, Response: ${response}`)
+        await history.createHistory(number,message,response)
+        await redis.createItem(number ,`  Message: ${textUser}, Response: ${response}`)
       } else {
-        await history.updateHistory(parsedToken,message,response)
-        await redis.updateItem(parsedToken, `  Message: ${message}, Response: ${response}`)
+        await history.updateHistory(number,message,response)
+        await redis.updateItem(number, `  Message: ${textUser}, Response: ${response}`)
       }
       models.forEach(async (model) => {
         this.SendMessageWtspp(model);
