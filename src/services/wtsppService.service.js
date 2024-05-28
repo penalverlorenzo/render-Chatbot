@@ -1,4 +1,4 @@
-import https from "https";
+// import https from "https";
 import { MessageText, messageButtons, messageList } from "../shared/whatsApp.modes.js";
 import { config } from "../config/index.js";
 import axios from "axios";
@@ -130,7 +130,7 @@ export class WtsppService extends PromptServices {
       const redis = new RedisServices()
       const redisItemToken = await redis.getItem(number)
 
-      //! pra crear los historiales de los chat en redis se van a hacer con el numero de celular
+      //! para crear los historiales de los chat en redis se van a hacer con el numero de celular
       const dataPrev = data.map(item => {
         const { _id, ...Data } = item;
         return Data._doc.Data;
@@ -153,20 +153,22 @@ export class WtsppService extends PromptServices {
         const model = wtsppModels.MessageText("Lo siento algo salio mal intesta mas tarde", number);
         models.push(model)
       }
-      
+      // Se comprueba si el usuario exede la cantidad de memoria permitida y se elimina su historial si es así
       const isMemoryFull = await redis.isMemoryFull(number)
       if (isMemoryFull) {
         redis.deleteItem(number)
       }
-      
+      // Se crea el historial si no existe
       if (!redisItemToken) {
-        // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
-        await history.createHistory(number,message,response)
+        await history.createHistory(number,textUser,response)
         await redis.createItem(number ,`  Message: ${textUser}, Response: ${response}`)
       } else {
-        await history.updateHistory(number,message,response)
+        // Se actualiza el historial
+        await history.updateHistory(number,textUser,response)
         await redis.updateItem(number, `  Message: ${textUser}, Response: ${response}`)
       }
+
+
       models.forEach(async (model) => {
         this.SendMessageWtspp(model);
         console.log({ model });

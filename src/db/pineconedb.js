@@ -32,4 +32,4 @@ indexList.indexes.forEach(async (index)=> {
 }
 
 
-createPineconeIndex()
+// createPineconeIndex()
