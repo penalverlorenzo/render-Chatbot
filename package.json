@@ -20,9 +20,11 @@
   },
   "homepage": "https://github.com/davidnogadev/nogadev-control-panel-api#readme",
   "dependencies": {
+    "@google-cloud/storage": "^7.11.1",
     "@google/generative-ai": "^0.9.0",
     "@hapi/boom": "^10.0.1",
     "@huggingface/inference": "^2.6.7",
+    "@langchain/google-vertexai": "^0.0.17",
     "@pinecone-database/pinecone": "^2.2.1",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",

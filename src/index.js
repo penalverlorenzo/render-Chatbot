@@ -10,10 +10,13 @@ import { redisRouter } from './routes/redisRouter.js';
 import { userRouter } from './routes/private/users.js';
 import { infoPrivateRouter } from './routes/private/infoPrivate.js';
 import { whatsAppRoutes } from './routes/public/whatsApp.js';
-
+import { LangChainService } from './services/langchain.service.js';
 
 const app = express();
 const PORT = config.port|| 3000;
+
+const caca = new LangChainService()
+caca.generateMessage("Hola",{sessionId: "abc4", historyMessagesKey: "Si"})
 
 app.use(cors({
     origin: config.hostIA,
@@ -21,7 +24,6 @@ app.use(cors({
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 app.use(bodyParser.json());
 
