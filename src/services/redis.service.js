@@ -25,15 +25,12 @@ async getItem(key){
 }
 async isMemoryFull (token){
     const memoryInfo = await client.info('memory')
-    const usedMemoryMatch =  memoryInfo.match(/used_memory:(\d+)/);
-    const usedMemory =  usedMemoryMatch? parseInt(usedMemoryMatch[1], 10) : 0;
-    // const maxMemory = 2 * 1024 * 1024
+    const totalMemoryMatch =  memoryInfo.match(/used_memory:(\d+)/);
+    const totalMemory =  totalMemoryMatch? parseInt(totalMemoryMatch[1], 10) : 0;
     const userHistoryMemory = await client.memoryUsage(token)
-    if ( (usedMemory/250) < userHistoryMemory ) {
-        // console.log({usedMemory: usedMemory/250 ,userHistoryMemory});
+    if ( (totalMemory/250) < userHistoryMemory ) {
         return true
     }else{
-        // console.log({usedMemory: usedMemory/250 ,userHistoryMemory});
         return false
     }
 }
