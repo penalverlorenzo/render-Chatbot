@@ -15,8 +15,8 @@ import { LangChainService } from './services/langchain.service.js';
 const app = express();
 const PORT = config.port|| 3000;
 
-const caca = new LangChainService()
-caca.generateMessage("Hola",{sessionId: "abc4", historyMessagesKey: "Si"})
+// const openAI = new LangChainService()
+// openAI.generateMessage("Hola",{sessionId: "abc4", historyMessagesKey: "Si"})
 
 app.use(cors({
     origin: config.hostIA,
