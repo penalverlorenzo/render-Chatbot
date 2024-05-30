@@ -195,10 +195,10 @@ export class PromptServices {
       if (!redisItemToken) {
         /* await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
          */        
-        // await history.createHistory(parsedToken,message,response)
+        await history.createHistory(parsedToken,message,response)
         await redis.createItem(parsedToken ,`  Message: ${message}, Response: ${response}`)
       } else {
-        // await history.updateHistory(parsedToken,message,response)
+        await history.updateHistory(parsedToken,message,response)
         await redis.updateItem(parsedToken, `  Message: ${message}, Response: ${response}`)
       }
 
