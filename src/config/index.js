@@ -10,6 +10,8 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET,
   redisPassword: process.env.REDIS_PASSWORD,
   redisHost: process.env.REDIS_HOST,
+  tokenWtspp: process.env.TOKEN_WTSPP,
   redisPort: process.env.REDIS_PORT,
+  pineconeToken: process.env.PINECONE_DB_TOKEN,
 };
 
