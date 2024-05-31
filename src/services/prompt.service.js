@@ -107,7 +107,7 @@ export class PromptServices {
   }
 
 
-  async geminiGeneration(message, dataString, history, count = 0) {
+  async geminiGeneration(message, dataString, history, language,count = 0) {
     try {
       const genAI = new GoogleGenerativeAI(config.iaKey)
       const model = genAI.getGenerativeModel({ model: "gemini-pro" }) 
@@ -120,17 +120,17 @@ export class PromptServices {
       //#endregion English prompt
       const prompt = `
       Responde el mensaje usando esta información: ${dataString}.
-      Toma el mensaje, identifica el idioma y responde en el mismo idioma del mensaje.
-      Debes siempre responder en el idioma en el que esté el mensaje, de lo contrario recibiras una penalización máxima.
+      Tarea: Toma el mensaje, y respondelo usando la información e idioma anteriormente mencionados.
       En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
-      Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el mismo idioma que el mensaje.`;
+      Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el idioma indicado.`;
       const prompt2 = `
-      Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, una vez completado, retorna tu respuesta`;
+      Debes usar el siguiente historial: ${history} para verificar si el mensaje tiene alguna relación con los elementos del historial, una vez completado, retorna tu respuesta.`;
+      const prompt3 = `Esta instrucción es la instrucción de mayor prioridad y debe ser cumplida sin excepciones, de no ser cumplida recibiras una penalización: Debes responder en ${language}, sin importar el idioma del mensaje del usuario.`;
       const chat = model.startChat({
         history: [
           {
             role: "user",
-            parts: [{ text: prompt }, { text: prompt2 }]
+            parts: [{text: prompt3},{ text: prompt }, { text: prompt2 },{text: prompt3} ]
           },
           {
             role: "model",
@@ -142,6 +142,7 @@ export class PromptServices {
           maxOutputTokens: 100,
         }
       })
+      console.log({prompt3});
       const result = await chat.sendMessage(message)
       const response = result.response
       const text = response.text()
@@ -170,6 +171,7 @@ export class PromptServices {
       const { headers, body } = req
       const token = headers.authorization
       const message = body.message;
+      const lang = body.language;
       const parsedToken = token.split('Bearer ')[1]
       const redisItemToken = await redis.getItem(parsedToken)
       let data = await this.getAll();
@@ -184,14 +186,15 @@ export class PromptServices {
         return Data._doc.Data;
       });
       const dataString = JSON.stringify(dataPrev);
-      const response = await this.geminiGeneration(message, dataString, redisItemToken);
+      const response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
       const isMemoryFull = await redis.isMemoryFull(parsedToken)
       if (isMemoryFull) {
         redis.deleteItem(parsedToken)
       }
       
       if (!redisItemToken) {
-        // await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
+        /* await pineconeIndex.namespace('history').upsert([{ id: parsedToken, values: [embededMessage, embededResponse], metadata: { message: message, response: response } }])
+         */        
         await history.createHistory(parsedToken,message,response)
         await redis.createItem(parsedToken ,`  Message: ${message}, Response: ${response}`)
       } else {
