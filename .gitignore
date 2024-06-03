@@ -12,7 +12,7 @@
 
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
-
+testlangchain-425018-b8fdc6823fb7.json
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
