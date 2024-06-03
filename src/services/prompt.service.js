@@ -154,7 +154,7 @@ export class PromptServices {
       const response = result.response
       const text = response.text()
       if ((text === '' && count <= 3)) {
-        return await this.geminiGeneration(message, dataString, count++);
+        return await this.geminiGeneration(message, dataString, history, language, count++);
       } else {
         return text
       }
@@ -166,7 +166,7 @@ export class PromptServices {
   }
   async langChaingGenerate(message, parsedToken, context) {
     try {
-      const response = this.geminiGeneration(message, parsedToken, context);
+      const response = vertex.generateMessage(message, parsedToken, context);
       return response
     } catch (error) {
       console.log('Hubo un error al implementar langcvhain =>', error);
@@ -202,13 +202,13 @@ export class PromptServices {
         return Data._doc.Data;
       });
       const dataString = JSON.stringify(dataPrev);
-      // const response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
-      const response = await this.langChaingGenerate(message,
-           parsedToken,
-        {
-          dataString,
-          language: lang
-        });
+      const response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
+      // const response = await this.langChaingGenerate(message,
+      //      parsedToken,
+      //   {
+      //     dataString,
+      //     language: lang
+      //   });
       const isMemoryFull = await redis.isMemoryFull(parsedToken)
       if (isMemoryFull) {
         redis.deleteItem(parsedToken)
