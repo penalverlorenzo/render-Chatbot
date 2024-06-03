@@ -164,9 +164,10 @@ export class PromptServices {
       throw new Error(`EN: There's something wrong, try sending your message again. ESP: Se ha producido un error, intenta enviar tu mensaje de vuelta: ${e.errorDetails[0].fieldViolations[0].description}`)
     }
   }
+
   async langChaingGenerate(message, parsedToken, context) {
     try {
-      const response = vertex.generateMessage(message, parsedToken, context);
+      const response = openAI.generateMessage(message, parsedToken, context);
       return response
     } catch (error) {
       console.log('Hubo un error al implementar langcvhain =>', error);
@@ -184,10 +185,11 @@ export class PromptServices {
       // const embededResponse = await model.embedContent(response, "retrieval_query")
       // console.log({embededResponse});
       //#endregion
-      const { headers, body } = req
+      const { headers, body } = req 
       const token = headers.authorization
       const message = body.message;
       const lang = body.language;
+      const IA = body.model;
       const parsedToken = token.split('Bearer ')[1]
       const redisItemToken = await redis.getItem(parsedToken)
       let data = await this.getAll();
@@ -202,13 +204,24 @@ export class PromptServices {
         return Data._doc.Data;
       });
       const dataString = JSON.stringify(dataPrev);
-      const response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
-      // const response = await this.langChaingGenerate(message,
-      //      parsedToken,
-      //   {
-      //     dataString,
-      //     language: lang
-      //   });
+
+      let response;
+      if (IA === "Gemini") {
+        response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
+        console.log(IA);
+      } else if(IA === "ChatGPT") {
+        response = await this.langChaingGenerate(message,
+              parsedToken,
+          {
+            dataString,
+            language: lang
+          });
+        console.log(IA);
+      } else {
+        response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
+      }
+
+
       const isMemoryFull = await redis.isMemoryFull(parsedToken)
       if (isMemoryFull) {
         redis.deleteItem(parsedToken)
