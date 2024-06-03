@@ -16,11 +16,12 @@ export class OpenAILangChainService {
         try {
             const data = context.dataString.replaceAll('"', '').replaceAll('{', ' ').replaceAll('}', ' ')
             const prompt1 = `
-        Responde el mensaje usando esta información: ${data}.
-        Tarea: Toma el mensaje, y respondelo usando la información e idioma anteriormente mencionados.
-        En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
-        Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el idioma indicado.`;
+                Responde el mensaje usando esta información: ${data}.
+                Tarea: Toma el mensaje, y respondelo usando la información e idioma anteriormente mencionados.
+                En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
+                Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el idioma indicado.`;
             const prompt0 = "Eres Kike, un asistente IA dedicado a responder preguntas sobre Nogadev"
+
             const message = [new HumanMessage({ content: userMessage })]
 
             const prompt = ChatPromptTemplate.fromMessages([
