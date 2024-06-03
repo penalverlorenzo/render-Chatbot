@@ -10,7 +10,7 @@ import { redisRouter } from './routes/redisRouter.js';
 import { userRouter } from './routes/private/users.js';
 import { infoPrivateRouter } from './routes/private/infoPrivate.js';
 import { whatsAppRoutes } from './routes/public/whatsApp.js';
-import { LangChainService } from './services/langchain.service.js';
+// import { LangChainService } from './services/langchain.service.js';
 
 const app = express();
 const PORT = config.port|| 3000;
