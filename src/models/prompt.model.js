@@ -16,8 +16,8 @@ export const promptPrivateModel = model("info_private", promptSchema)
 
 const historySchema = new Schema({
     historyId: {type: String, required: true}, 
-    message: { type: Array, require: true },
-    response: { type: Array, require: true }
+    history: { type: Array, require: true },
+    // response: { type: Array, require: true }
 });
 
 export const historyModel = model("history", historySchema)
