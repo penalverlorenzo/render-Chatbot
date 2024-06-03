@@ -166,7 +166,7 @@ export class PromptServices {
   }
   async langChaingGenerate(message, parsedToken, context) {
     try {
-      const response = vertex.generateMessage(message, parsedToken, context);
+      const response = this.geminiGeneration(message, parsedToken, context);
       return response
     } catch (error) {
       console.log('Hubo un error al implementar langcvhain =>', error);

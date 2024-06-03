@@ -1,4 +1,4 @@
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage,AIMessage } from "@langchain/core/messages";
 import { InMemoryChatMessageHistory } from "@langchain/core/chat_history";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { Storage } from '@google-cloud/storage';
@@ -26,7 +26,6 @@ const model = new ChatVertexAI({
 },
 );
 
-// console.log({model});
 export class VertexLangChainService {
   constructor() {
     this.messageHistories = {
@@ -41,7 +40,7 @@ export class VertexLangChainService {
         En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
         Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el idioma indicado.`;
       const prompt0 = "Eres Kike, un asistente IA dedicado a responder preguntas sobre Nogadev"
-      const message = [new HumanMessage({ content: userMessage })]
+      const message = [new HumanMessage({ content: userMessage, name: userMessage + '2' })]
 
       // const prompt = ChatPromptTemplate.fromMessages([
       //   ["system", prompt0 + " " + prompt1],
@@ -50,9 +49,9 @@ export class VertexLangChainService {
       //   ["placeholder", "{chat_history}"],
       // ]);
       const prompt = ChatPromptTemplate.fromMessages([
-        ["system", prompt0],
+        ["system", prompt0+ "  " + prompt1 ],
         ["human", "{input}"], // Respuesta del modelo
-        ["ai", 'Holaa'],
+        ["ai", 'Hola'],
         ["placeholder", "{chat_history}"],
       ]);
       const filterMessages = ({ chat_history }) => {
@@ -66,7 +65,6 @@ export class VertexLangChainService {
         model,
       ]);
 
-
       const withMessageHistory = new RunnableWithMessageHistory({
         runnable: chain,
         getMessageHistory: async (sessionId) => {
@@ -74,13 +72,20 @@ export class VertexLangChainService {
             const messageHistory = new InMemoryChatMessageHistory();
             await messageHistory.addMessages(message);
             this.messageHistories[sessionId] = messageHistory;
+            console.log({messageHistory});
+            return this.messageHistories[sessionId]
+          }else{
+            if (this.messageHistories[tokenSessionId].messages[0].content === this.messageHistories[tokenSessionId].messages[1].content) {
+              this.messageHistories[tokenSessionId].messages.splice(1, 1);
+            }
+            console.log({history_else: this.messageHistories[tokenSessionId].messages});
+            return this.messageHistories[sessionId];
           }
-          return this.messageHistories[sessionId];
         },
         inputMessagesKey: "input",
         historyMessagesKey: "chat_history",
       });
-
+      
       const config = {
         configurable: {
           sessionId: tokenSessionId,
@@ -92,16 +97,9 @@ export class VertexLangChainService {
         },
         config
       );
-      console.log('--------'.repeat(10));
-      console.log(response);
-      console.log('--------'.repeat(10));
       const res = response.content
       return res;
     } catch (error) {
-      console.log('--//----'.repeat(10));
-      console.log(error);
-      console.log("data",error.config);
-      console.log('--//----'.repeat(10));
       throw new Error(error);
     }
 
