@@ -113,6 +113,31 @@ export class PromptServices {
     }
   }
 
+  async detectLanguage(message) {
+    const genAI = new GoogleGenerativeAI(config.iaKey)
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" })
+    const prompt = `Eres un detector de idiomas, por lo que debes detectar y retornar el idioma del siguiente mensaje: ${message}`
+    const chat = model.startChat({
+      history: [
+        {
+          role: "user",
+          parts: [{ text: prompt}]
+        },
+        {
+          role: "model",
+          parts: [{ text: "I'm a language detector" }]
+        },
+      ],
+      generationConfig: {
+        maxOutputTokens: 100,
+      }
+    })
+    const result = await chat.sendMessage(message)
+    const response = result.response
+    const text = response.text()
+    // console.log({text});
+    return text
+  }
 
   async geminiGeneration(message, dataString, history, language, count = 0) {
     try {
@@ -149,7 +174,6 @@ export class PromptServices {
           maxOutputTokens: 100,
         }
       })
-      console.log({ prompt3 });
       const result = await chat.sendMessage(message)
       const response = result.response
       const text = response.text()
@@ -185,7 +209,7 @@ export class PromptServices {
       // const embededResponse = await model.embedContent(response, "retrieval_query")
       // console.log({embededResponse});
       //#endregion
-      const { headers, body } = req 
+      const { headers, body } = req
       const token = headers.authorization
       const message = body.message;
       const lang = body.language;
@@ -209,15 +233,15 @@ export class PromptServices {
       if (IA === "Gemini") {
         response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
         console.log(IA);
-      } else if(IA === "ChatGPT") {
+      } else if (IA === "ChatGPT") {
         response = await this.langChaingGenerate(message,
-              parsedToken,
+          parsedToken,
           {
             dataString,
             language: lang
           });
-        console.log(IA);
-      } else {
+          console.log(IA);
+        } else {
         response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
       }
 
