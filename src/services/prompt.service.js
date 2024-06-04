@@ -135,7 +135,7 @@ export class PromptServices {
     const result = await chat.sendMessage(message)
     const response = result.response
     const text = response.text()
-    // console.log({text});
+    console.log({text});
     return text
   }
 

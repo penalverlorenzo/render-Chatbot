@@ -14,5 +14,8 @@ export const config = {
   redisPort: process.env.REDIS_PORT,
   pineconeToken: process.env.PINECONE_DB_TOKEN,
   openaiKey: process.env.OPENAI_API_KEY,
+  wspAccessToken: process.env.WSP_ACCESS_TOKEN,
+  wspURL: process.env.WSP_URL
 };
+
 
