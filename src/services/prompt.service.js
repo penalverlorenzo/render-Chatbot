@@ -171,7 +171,7 @@ export class PromptServices {
         ],
         context: "sos un agente IA de nogadev, te llamas Kike, estas para ayudar a los usuarios de su pagina",
         generationConfig: {
-          maxOutputTokens: 100,
+          maxOutputTokens: 200,
         }
       })
       const result = await chat.sendMessage(message)
