@@ -176,10 +176,15 @@ export class PromptServices {
       })
       const result = await chat.sendMessage(message)
       const response = result.response
-      const text = response.text()
+      let text = response.text()
+      if (typeof text === "string") {
+        console.log({text});
+        text = text.replaceAll("*", "")
+      }
       if ((text === '' && count <= 3)) {
         return await this.geminiGeneration(message, dataString, history, language, count++);
-      } else {
+      }else {
+        // console.log({text});
         return text
       }
     } catch (e) {
