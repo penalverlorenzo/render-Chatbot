@@ -9,7 +9,8 @@ import { HistoryServices } from "./history.service.js";
 export class WtsppService extends PromptServices {
   VerifyToken = (req, res) => {
     try {
-      const accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciIsImlhdCI6MTcxNjQwMzYzNCwiZXhwIjoxNzE2NDQ2ODM0fQ.KIZO2MQjACmubN-8eIsTpttjxD7mKPRVAE0t1MBn3DE"; //!generar un token seguro
+      const accessToken = config.wspAccessToken
+       //!generar un token seguro
       const token = req.query["hub.verify_token"];
       const challenge = req.query["hub.challenge"];
 
@@ -76,7 +77,7 @@ export class WtsppService extends PromptServices {
   SendMessageWtspp = async (data) => {
     console.log({ data });
     try {
-      const url = 'https://graph.facebook.com/v19.0/325486840648107/messages';
+      const url = config.wspURL;
       const token = config.tokenWtspp; //! conseguir token permanente
 
       await axios.post(url, data, {
@@ -136,7 +137,8 @@ export class WtsppService extends PromptServices {
         return Data._doc.Data;
       });
       const dataString = JSON.stringify(dataPrev);
-      const response = await this.geminiGeneration(textUser, dataString, redisItemToken);
+      const language = await this.detectLanguage(textUser)
+      const response = await this.geminiGeneration(textUser, dataString, redisItemToken, language);
       if (/^(options|option)\b/i.test(textUser)) {
         const model = messageButtons("Here are your options:", number, "Co-Founders", "About Us")
         models.push(model)
