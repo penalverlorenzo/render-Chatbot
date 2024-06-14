@@ -12,12 +12,13 @@ import { compare } from "bcrypt";
 import { HistoryServices } from './history.service.js';
 import { OpenAILangChainService } from "./langchain.service.js";
 import { VertexLangChainService } from "./geminiLangChain.service.js";
+import { agent } from "../libs/openAIAgent.js";
 // import { pineconeDB } from "../db/pineconedb.js";
 const redis = new RedisServices()
 const history = new HistoryServices()
 const openAI = new OpenAILangChainService()
 const vertex = new VertexLangChainService()
-
+const agentAI = new agent()
 
 
 const parseMessage = (message) => {
@@ -199,7 +200,8 @@ export class PromptServices {
 
   async langChaingGenerate(message, parsedToken, context) {
     try {
-      const response = openAI.generateMessage(message, parsedToken, context);
+      // const response = openAI.generateMessage(message, parsedToken, context);
+      const response = agentAI.agentCreation(message, parsedToken, context)
       return response
     } catch (error) {
       console.log('Hubo un error al implementar langcvhain =>', error);
@@ -250,7 +252,13 @@ export class PromptServices {
           });
           console.log(IA);
         } else {
-        response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
+        // response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
+        response = await this.langChaingGenerate(message,
+          parsedToken,
+          {
+            dataString,
+            language: lang
+          });
       }
 
 
