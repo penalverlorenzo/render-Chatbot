@@ -7,8 +7,8 @@ const slackServices =  new SlackServices(slackClient);
 const { slack: { channelId } } = config;
 export const slackController = async (req, res, next)=>{
   try {
-    const { message } = req.body;
-    const response = await slackServices.postMessage({message, channelId});
+    const { message, sessionId } = req.body;
+    const response = await slackServices.handleMessage({message, channelId, sessionId});
     console.log(response);
     next()
   } catch (error) {
