@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PromptServices } from '../../services/prompt.service.js';
 import { verificationToken } from '../../middlewares/verificationToken.js';
-import { slackController } from '../../controllers/slack.controller.js';
+// import { slackController } from '../../controllers/slack.controller.js';
 
 export const infoRouter = Router();
 
@@ -10,7 +10,7 @@ const service = new PromptServices()
 infoRouter.use(verificationToken);
 
 infoRouter.post('/info', 
-  slackController,
+  // slackController,
   async (req, res) => {
   try {
     const created = await service.postResponse(res, req, "public")

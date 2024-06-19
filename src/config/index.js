@@ -12,14 +12,15 @@ export const config = {
   redisHost: process.env.REDIS_HOST,
   tokenWtspp: process.env.TOKEN_WTSPP,
   redisPort: process.env.REDIS_PORT,
-  pineconeToken: process.env.PINECONE_DB_TOKEN,
+  // pineconeToken: process.env.PINECONE_DB_TOKEN,
   openaiKey: process.env.OPENAI_API_KEY,
   wspAccessToken: process.env.WSP_ACCESS_TOKEN,
   wspURL: process.env.WSP_URL,
+  nodemailerUser: process.env.MAIL_USER,
+  nodemailerPassword: process.env.MAIL_PASS,
+  nodemailerSupportMail: process.env.MAIL_SUPPORT,
   slack: {
     token: process.env.SLACK_WORKSPACE_TOKEN,
     channelId: process.env.CHANNEL_ID
-  }
+  },
 };
-
-

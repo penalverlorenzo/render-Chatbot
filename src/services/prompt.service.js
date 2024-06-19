@@ -198,10 +198,10 @@ export class PromptServices {
     }
   }
 
-  async langChaingGenerate(message, parsedToken, context) {
+  async langChaingGenerate(message, parsedToken, context, whatsApp) {
     try {
       // const response = openAI.generateMessage(message, parsedToken, context);
-      const response = agentAI.agentCreation(message, parsedToken, context)
+      const response = agentAI.agentCreation(message, parsedToken, context, whatsApp)
       return response
     } catch (error) {
       console.log('Hubo un error al implementar langcvhain =>', error);
@@ -249,16 +249,15 @@ export class PromptServices {
           {
             dataString,
             language: lang
-          });
+          }, false);
           console.log(IA);
         } else {
         // response = await this.geminiGeneration(message, dataString, redisItemToken, lang);
-        response = await this.langChaingGenerate(message,
-          parsedToken,
+        response = await this.langChaingGenerate(message,parsedToken,
           {
             dataString,
             language: lang
-          });
+          }, false);
       }
 
 

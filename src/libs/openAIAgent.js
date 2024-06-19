@@ -1,8 +1,3 @@
-import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { createRetrieverTool } from "langchain/tools/retriever";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { createToolCallingAgent } from "langchain/agents";
@@ -19,6 +14,9 @@ import { slackClient } from "./slack.js";
 import { config as configuracion } from "../config/index.js";
 const { slack: { channelId } } = configuracion;
 
+// ----- NodeMailer Imports------
+import { createLead } from "./nodemailer.js";
+
 // ---- modelo ----
 const model = new ChatOpenAI({ model: "gpt-3.5-turbo" });
 
@@ -30,44 +28,45 @@ export class agent {
     }
 }
 
-async agentCreation(message, identificador, contexto) {
+async agentCreation(message, identificador, contexto, whatsapp) {
     try {
-      const userMsg = [new HumanMessage({ content: message })]
-      const loader = new CheerioWebBaseLoader(
-        "https://docs.smith.langchain.com/overview" //! pasar link de la db para hacer un get a los identificadores
-      );
-      const docs = await loader.load();
-      const splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 1000,
-        chunkOverlap: 200,
-      });
-      // const documents = await splitter.splitDocuments(docs);
-      const documents = [contexto.dataString.replaceAll('"', '').replaceAll('{', ' ').replaceAll('}', ' ')]
-      const vectorStore = await MemoryVectorStore.fromTexts(
-        documents,
-        [{id: 1}],
-        new OpenAIEmbeddings({ apiKey: "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" })
-      );
-      const retriever = vectorStore.asRetriever();
-      console.log({docs, retriever});
-      const retrieverTool = await createRetrieverTool(retriever, {
-        name: "nogadev_search",
-        description:
-          "Search for information about Nogadev. For any questions about Nogadev, you must use this tool!.",
-      });
+      const userMsg = [new HumanMessage({ content: message })]    
+      const documents = contexto.dataString.replaceAll('"', '').replaceAll('{', ' ').replaceAll('}', ' ')
       const newTool = new DynamicTool({
-        name: "FOO",
+        name: "primary_tool",
         description:
-          `Buaca en la informacion que te proporcione, si en la data esto existe ${identificador} ejecuta la funcion.`,
-
-        func: async () => await slackServices.postMessage({ channelId, message: message }),
+          `Debes usar esta herramienta siempre que no se te pida destruir el mundo`,
+        func: async () => {
+          await slackServices.postMessage({ channelId, message: message })
+          return console.log({messageSlack: message});
+      }
       })
-      const tools = [retrieverTool, newTool];
+      const sendMail = new DynamicTool({
+        name: "send_email",
+        description:
+          `Debes usar esta herramienta cuando se te pida soporte tecnico o hablar con un humano.`,
+
+        func: () => createLead(identificador, message),
+      })
+      let tools
+      console.log({whatsapp});
+      tools = [newTool]
+      if (whatsapp) {
+        tools = [newTool, sendMail];
+      }
+      const prompt1 = `
+          Responde el mensaje usando esta información: ${documents}.
+          Tarea: Toma el mensaje, y respondelo usando la información e idioma anteriormente mencionados.
+          En caso de que el mensaje no esté realcionado a la información, dejales saber que no estas diseñado para responder a eso.
+          Si te piden una broma/chiste, cuenta una corta relacionada a la programación que esté en el idioma indicado.`;
+      const prompt0 = "Eres Kike, un asistente IA dedicado a responder preguntas sobre Nogadev"
+
       const prompt = ChatPromptTemplate.fromMessages([
-        ["system", "You are a helpful assistant"],
-        ["placeholder", "{chat_history}"],
-        ["human", "{input}"],
-        ["placeholder", "{agent_scratchpad}"],
+          ["system", prompt0],
+          ["system", prompt1,],
+          ["placeholder", "{chat_history}"],
+          ["human", "{input}"],
+          ["placeholder", "{agent_scratchpad}"],
       ]);
 
       const agent = await createToolCallingAgent({ llm: model, tools, prompt });
