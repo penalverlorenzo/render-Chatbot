@@ -50,7 +50,7 @@ async agentCreation(message, identificador, contexto, whatsapp) {
       })
       let tools
       console.log({whatsapp});
-      tools = [newTool]
+      tools = [newTool, sendMail]
       if (whatsapp) {
         tools = [newTool, sendMail];
       }
